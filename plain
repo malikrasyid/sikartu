@@ -1,0 +1,1042 @@
+<!doctype html>
+<html lang="id" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SI-KARTU - Sistem Katalog Arsip Tindak Pidana Khusus</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Source+Sans+3:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    .font-display { font-family: 'Playfair Display', serif; }
+    .font-body { font-family: 'Source Sans 3', sans-serif; }
+    
+    .sidebar-item {
+      transition: all 0.2s ease;
+    }
+    .sidebar-item:hover {
+      background: rgba(212, 175, 55, 0.1);
+      border-left: 3px solid #d4af37;
+    }
+    .sidebar-item.active {
+      background: rgba(212, 175, 55, 0.15);
+      border-left: 3px solid #d4af37;
+    }
+    
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(139, 31, 35, 0.15);
+    }
+    
+    .folder-item {
+      transition: all 0.2s ease;
+    }
+    .folder-item:hover {
+      background: #f8fafc;
+    }
+    
+    .doc-item {
+      transition: all 0.2s ease;
+    }
+    .doc-item:hover {
+      background: #fef3c7;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, #8b1f23 0%, #a62529 100%);
+    }
+    
+    .logo-glow {
+      filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.3));
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.4s ease forwards;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 6px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: #e2e8f0;
+    }
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 3px;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ </head>
+ <body class="h-full font-body bg-[#faf8f5] text-[#2c1810]">
+  <div id="app" class="h-full w-full flex overflow-hidden">
+    <!-- Sidebar -->
+   <aside class="w-72 bg-gradient-to-b from-[#8b1f23] to-[#5c1416] text-white flex flex-col shadow-2xl"><!-- Logo Section -->
+    <div class="p-6 border-b border-white/10">
+     <div class="flex items-center gap-4"><!-- SI-KARTU Logo -->
+      <div class="w-16 h-16 logo-glow"><img src="https://kejari-kotabaru.kejaksaan.go.id/wp-content/uploads/2025/11/logo-pidsus-945x1024-1.png" alt="Logo SI-KARTU" loading="lazy" class="w-full h-full object-contain", this.src); this.style.background='#1a237e'; this.alt='Logo unavailable';">
+      </div>
+      <div>
+       <h1 class="font-display text-xl font-bold text-[#d4af37]">SI-KARTU</h1>
+       <p class="text-xs text-slate-300 leading-tight">Sistem Katalog Arsip<br>
+        Tindak Pidana Khusus</p>
+      </div>
+     </div>
+     <div class="mt-4 pt-4 border-t border-white/10">
+      <p id="institutionDisplay" class="text-sm font-medium text-white">Kejaksaan Tinggi Sumatera Barat</p>
+      <p id="divisionDisplay" class="text-xs text-slate-400">Bidang Tindak Pidana Khusus</p>
+     </div>
+    </div><!-- Navigation -->
+    <nav class="flex-1 py-4 overflow-y-auto scrollbar-thin">
+     <ul class="space-y-1">
+      <li><button onclick="showPage('dashboard')" class="sidebar-item active w-full flex items-center gap-3 px-6 py-3 text-left" data-page="dashboard">
+        <svg class="w-5 h-5 text-[#d4af37]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg><span class="font-medium">Beranda</span> </button></li>
+      <li><button onclick="showPage('archive')" class="sidebar-item w-full flex items-center gap-3 px-6 py-3 text-left" data-page="archive">
+        <svg class="w-5 h-5 text-[#d4af37]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+        </svg><span class="font-medium">Arsip Perkara</span> </button></li>
+      <li><button onclick="showPage('search')" class="sidebar-item w-full flex items-center gap-3 px-6 py-3 text-left" data-page="search">
+        <svg class="w-5 h-5 text-[#d4af37]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg><span class="font-medium">Pencarian</span> </button></li>
+      <li><button onclick="showPage('add')" class="sidebar-item w-full flex items-center gap-3 px-6 py-3 text-left" data-page="add">
+        <svg class="w-5 h-5 text-[#d4af37]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg><span class="font-medium">Tambah Perkara</span> </button></li>
+      <li><button onclick="showPage('about')" class="sidebar-item w-full flex items-center gap-3 px-6 py-3 text-left" data-page="about">
+        <svg class="w-5 h-5 text-[#d4af37]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg><span class="font-medium">Tentang Kami</span> </button></li>
+     </ul>
+    </nav><!-- Footer -->
+    <div class="p-4 border-t border-white/10 text-center">
+     <p class="text-xs text-slate-400">© 2024-2026 Kejati Sumbar</p>
+     <p class="text-xs text-slate-500 mt-1">v1.0.0</p>
+    </div>
+   </aside><!-- Main Content -->
+   <main class="flex-1 overflow-y-auto scrollbar-thin">
+    <!-- Dashboard Page -->
+    <div id="page-dashboard" class="page-content p-8 animate-fade-in">
+     <header class="mb-8">
+      <h2 class="font-display text-3xl font-bold text-[#8b1f23]">Dashboard</h2>
+      <p class="text-slate-600 mt-1">Ringkasan data arsip perkara tindak pidana khusus</p>
+     </header><!-- Total Stats Card -->
+     <div class="mb-6">
+      <div class="stat-card rounded-xl p-6 text-white card-hover">
+       <div class="flex items-center justify-between">
+        <div>
+         <p class="text-slate-300 text-sm">Total Seluruh Perkara</p>
+         <p id="statTotal" class="text-5xl font-bold mt-1">0</p>
+        </div>
+        <div class="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center">
+         <svg class="w-10 h-10 text-[#d4af37]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+         </svg>
+        </div>
+       </div>
+      </div>
+     </div><!-- Penyelidikan Stats -->
+     <div class="mb-6">
+      <h3 class="font-display text-xl font-semibold text-[#8b1f23] mb-4 flex items-center gap-2"><span class="text-2xl">🔍</span> Penyelidikan</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+       <div class="bg-white rounded-xl p-5 shadow-lg border border-slate-100 card-hover">
+        <div class="flex items-center justify-between">
+         <div>
+          <p class="text-slate-500 text-sm">Tahun 2024</p>
+          <p id="statPenyelidikan2024" class="text-3xl font-bold text-[#8b1f23] mt-1">0</p>
+         </div>
+         <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center"><span class="text-xl">📊</span>
+         </div>
+        </div>
+       </div>
+       <div class="bg-white rounded-xl p-5 shadow-lg border border-slate-100 card-hover">
+        <div class="flex items-center justify-between">
+         <div>
+          <p class="text-slate-500 text-sm">Tahun 2025</p>
+          <p id="statPenyelidikan2025" class="text-3xl font-bold text-[#8b1f23] mt-1">0</p>
+         </div>
+         <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center"><span class="text-xl">📊</span>
+         </div>
+        </div>
+       </div>
+       <div class="bg-white rounded-xl p-5 shadow-lg border border-slate-100 card-hover">
+        <div class="flex items-center justify-between">
+         <div>
+          <p class="text-slate-500 text-sm">Tahun 2026</p>
+          <p id="statPenyelidikan2026" class="text-3xl font-bold text-[#8b1f23] mt-1">0</p>
+         </div>
+         <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center"><span class="text-xl">📊</span>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div><!-- Penyidikan Stats -->
+     <div class="mb-8">
+      <h3 class="font-display text-xl font-semibold text-[#8b1f23] mb-4 flex items-center gap-2"><span class="text-2xl">⚖️</span> Penyidikan</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+       <div class="bg-white rounded-xl p-5 shadow-lg border border-slate-100 card-hover">
+        <div class="flex items-center justify-between">
+         <div>
+          <p class="text-slate-500 text-sm">Tahun 2024</p>
+          <p id="statPenyidikan2024" class="text-3xl font-bold text-[#8b1f23] mt-1">0</p>
+         </div>
+         <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center"><span class="text-xl">📈</span>
+         </div>
+        </div>
+       </div>
+       <div class="bg-white rounded-xl p-5 shadow-lg border border-slate-100 card-hover">
+        <div class="flex items-center justify-between">
+         <div>
+          <p class="text-slate-500 text-sm">Tahun 2025</p>
+          <p id="statPenyidikan2025" class="text-3xl font-bold text-[#8b1f23] mt-1">0</p>
+         </div>
+         <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center"><span class="text-xl">📈</span>
+         </div>
+        </div>
+       </div>
+       <div class="bg-white rounded-xl p-5 shadow-lg border border-slate-100 card-hover">
+        <div class="flex items-center justify-between">
+         <div>
+          <p class="text-slate-500 text-sm">Tahun 2026</p>
+          <p id="statPenyidikan2026" class="text-3xl font-bold text-[#8b1f23] mt-1">0</p>
+         </div>
+         <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center"><span class="text-xl">📈</span>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div><!-- Status Overview -->
+     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-100">
+       <h3 class="font-display text-lg font-semibold text-[#8b1f23] mb-4">Status Penyelidikan</h3>
+       <div class="space-y-4">
+        <div class="flex items-center justify-between">
+         <div class="flex items-center gap-3"><span class="w-3 h-3 bg-blue-500 rounded-full"></span> <span class="text-slate-600">Dalam Proses</span>
+         </div><span id="statusPenyelidikanProses" class="font-semibold text-[#8b1f23]">0</span>
+        </div>
+        <div class="flex items-center justify-between">
+         <div class="flex items-center gap-3"><span class="w-3 h-3 bg-red-500 rounded-full"></span> <span class="text-slate-600">Dihentikan</span>
+         </div><span id="statusPenyelidikanDihentikan" class="font-semibold text-[#8b1f23]">0</span>
+        </div>
+        <div class="flex items-center justify-between">
+         <div class="flex items-center gap-3"><span class="w-3 h-3 bg-green-500 rounded-full"></span> <span class="text-slate-600">Naik Penyidikan</span>
+         </div><span id="statusPenyelidikanNaik" class="font-semibold text-[#8b1f23]">0</span>
+        </div>
+       </div>
+      </div>
+      <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-100">
+       <h3 class="font-display text-lg font-semibold text-[#8b1f23] mb-4">Status Penyidikan</h3>
+       <div class="space-y-4">
+        <div class="flex items-center justify-between">
+         <div class="flex items-center gap-3"><span class="w-3 h-3 bg-blue-500 rounded-full"></span> <span class="text-slate-600">Dalam Proses</span>
+         </div><span id="statusPenyidikanProses" class="font-semibold text-[#8b1f23]">0</span>
+        </div>
+        <div class="flex items-center justify-between">
+         <div class="flex items-center gap-3"><span class="w-3 h-3 bg-red-500 rounded-full"></span> <span class="text-slate-600">Dihentikan</span>
+         </div><span id="statusPenyidikanDihentikan" class="font-semibold text-[#8b1f23]">0</span>
+        </div>
+        <div class="flex items-center justify-between">
+         <div class="flex items-center gap-3"><span class="w-3 h-3 bg-purple-500 rounded-full"></span> <span class="text-slate-600">Naik PraPenuntutan</span>
+         </div><span id="statusPenyidikanNaik" class="font-semibold text-[#8b1f23]">0</span>
+        </div>
+       </div>
+      </div>
+     </div><!-- Recent Cases -->
+     <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-100">
+      <h3 class="font-display text-lg font-semibold text-[#8b1f23] mb-4">Perkara Terbaru</h3>
+      <div id="recentCases" class="space-y-3">
+       <p class="text-slate-400 text-sm italic">Belum ada perkara terdaftar</p>
+      </div>
+     </div>
+    </div>
+    <!-- Archive Page -->
+    <div id="page-archive" class="page-content p-8 hidden">
+     <header class="mb-8">
+      <h2 class="font-display text-3xl font-bold text-[#8b1f23]">Arsip Perkara</h2>
+      <p class="text-slate-600 mt-1">Kelola dan akses dokumen perkara berdasarkan tahun</p>
+     </header><!-- Year Tabs -->
+     <div class="flex gap-2 mb-6"><button onclick="filterYear('all')" class="year-tab px-6 py-2 rounded-lg font-medium transition-all bg-[#8b1f23] text-white" data-year="all">Semua</button> <button onclick="filterYear(2024)" class="year-tab px-6 py-2 rounded-lg font-medium transition-all bg-slate-100 text-slate-600 hover:bg-slate-200" data-year="2024">2024</button> <button onclick="filterYear(2025)" class="year-tab px-6 py-2 rounded-lg font-medium transition-all bg-slate-100 text-slate-600 hover:bg-slate-200" data-year="2025">2025</button> <button onclick="filterYear(2026)" class="year-tab px-6 py-2 rounded-lg font-medium transition-all bg-slate-100 text-slate-600 hover:bg-slate-200" data-year="2026">2026</button>
+     </div><!-- Cases List -->
+     <div id="archiveList" class="space-y-4">
+      <div class="bg-white rounded-xl p-8 shadow-lg border border-slate-100 text-center">
+       <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4"><span class="text-3xl">📂</span>
+       </div>
+       <p class="text-slate-500">Belum ada perkara terdaftar</p>
+       <p class="text-slate-400 text-sm mt-1">Klik "Tambah Perkara" untuk menambahkan data baru</p>
+      </div>
+     </div>
+    </div><!-- Search Page -->
+    <div id="page-search" class="page-content p-8 hidden">
+     <header class="mb-8">
+      <h2 class="font-display text-3xl font-bold text-[#8b1f23]">Pencarian Perkara</h2>
+      <p class="text-slate-600 mt-1">Cari perkara berdasarkan berbagai kriteria</p>
+     </header><!-- Search Form -->
+     <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-100 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+       <div><label for="searchKeyword" class="block text-sm font-medium text-slate-700 mb-2">Kata Kunci</label> <input type="text" id="searchKeyword" placeholder="Cari nama, lembaga..." class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#8b1f23] focus:border-transparent outline-none">
+       </div>
+       <div><label for="searchYear" class="block text-sm font-medium text-slate-700 mb-2">Tahun</label> <select id="searchYear" class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#8b1f23] focus:border-transparent outline-none"> <option value="">Semua Tahun</option> <option value="2024">2024</option> <option value="2025">2025</option> <option value="2026">2026</option> </select>
+       </div>
+       <div><label for="searchStatus" class="block text-sm font-medium text-slate-700 mb-2">Status</label> <select id="searchStatus" class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#8b1f23] focus:border-transparent outline-none"> <option value="">Semua Status</option> <optgroup label="Penyelidikan"> <option value="Penyelidikan - Dalam Proses">Dalam Proses</option> <option value="Penyelidikan - Dihentikan">Dihentikan</option> <option value="Penyelidikan - Naik Penyidikan">Naik Penyidikan</option> </optgroup> <optgroup label="Penyidikan"> <option value="Penyidikan - Dalam Proses">Dalam Proses</option> <option value="Penyidikan - Dihentikan">Dihentikan</option> <option value="Penyidikan - Naik PraPenuntutan">Naik PraPenuntutan</option> </optgroup> </select>
+       </div>
+       <div class="flex items-end"><button onclick="performSearch()" class="w-full px-6 py-2 bg-[#8b1f23] text-white rounded-lg font-medium hover:bg-[#a62529] transition-colors flex items-center justify-center gap-2">
+         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+         </svg> Cari </button>
+       </div>
+      </div>
+     </div><!-- Search Results -->
+     <div id="searchResults" class="space-y-4">
+      <div class="bg-slate-50 rounded-xl p-8 text-center">
+       <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+       </div>
+       <p class="text-slate-500">Masukkan kriteria pencarian</p>
+       <p class="text-slate-400 text-sm mt-1">Hasil pencarian akan ditampilkan di sini</p>
+      </div>
+     </div>
+    </div>
+    <!-- Add Case Page -->
+    <div id="page-add" class="page-content p-8 hidden">
+     <header class="mb-8">
+      <h2 class="font-display text-3xl font-bold text-[#8b1f23]">Tambah Perkara Baru</h2>
+      <p class="text-slate-600 mt-1">Daftarkan perkara baru ke dalam sistem arsip</p>
+     </header>
+     <form id="addCaseForm" class="bg-white rounded-xl p-6 shadow-lg border border-slate-100 max-w-3xl">
+      <div class="space-y-6">
+       <div><label for="caseYear" class="block text-sm font-medium text-slate-700 mb-2">Tahun <span class="text-red-500">*</span></label> <select id="caseYear" required class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#8b1f23] focus:border-transparent outline-none"> <option value="">Pilih Tahun</option> <option value="2024">2024</option> <option value="2025">2025</option> <option value="2026">2026</option> </select>
+       </div>
+       <div><label for="caseName" class="block text-sm font-medium text-slate-700 mb-2">Nama Perkara <span class="text-red-500">*</span></label> <input type="text" id="caseName" required placeholder="Contoh: Dugaan Tindak Pidana Korupsi pada Perumda PSM Kota Padang" class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#8b1f23] focus:border-transparent outline-none">
+       </div>
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div><label for="spNumber" class="block text-sm font-medium text-slate-700 mb-2">Nomor SP <span class="text-red-500">*</span></label> <input type="text" id="spNumber" required placeholder="Contoh: 01/L.3/Fd.1/01/2024" class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#8b1f23] focus:border-transparent outline-none">
+        </div>
+        <div><label for="spDate" class="block text-sm font-medium text-slate-700 mb-2">Tanggal SP <span class="text-red-500">*</span></label> <input type="date" id="spDate" required class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#8b1f23] focus:border-transparent outline-none">
+        </div>
+       </div>
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div><label for="caseType" class="block text-sm font-medium text-slate-700 mb-2">Jenis Perkara <span class="text-red-500">*</span></label> <select id="caseType" required class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#8b1f23] focus:border-transparent outline-none" onchange="updateStatusOptions()"> <option value="">Pilih Jenis Perkara</option> <option value="Penyelidikan">Penyelidikan</option> <option value="Penyidikan">Penyidikan</option> </select>
+        </div>
+        <div><label for="caseStatus" class="block text-sm font-medium text-slate-700 mb-2">Status Perkara <span class="text-red-500">*</span></label> <select id="caseStatus" required class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#8b1f23] focus:border-transparent outline-none"> <option value="">Pilih Status</option> </select>
+        </div>
+       </div>
+       <div><label for="caseDocuments" class="block text-sm font-medium text-slate-700 mb-2">Dokumen Terkait</label> <textarea id="caseDocuments" rows="4" placeholder="Upload Link Google Drive Dokumen
+
+Contoh:
+https://drive.google.com/file/d/xxxxx/view
+https://drive.google.com/file/d/yyyyy/view" class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#8b1f23] focus:border-transparent outline-none"></textarea>
+        <p class="text-xs text-slate-400 mt-1">Masukkan link Google Drive dokumen, satu link per baris</p>
+       </div>
+       <div class="flex gap-4 pt-4"><button type="submit" id="submitBtn" class="px-8 py-3 bg-[#8b1f23] text-white rounded-lg font-medium hover:bg-[#a62529] transition-colors flex items-center gap-2">
+         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+         </svg> Simpan Perkara </button> <button type="button" onclick="resetForm()" class="px-8 py-3 bg-slate-100 text-slate-600 rounded-lg font-medium hover:bg-slate-200 transition-colors"> Reset </button>
+       </div>
+      </div>
+     </form><!-- Success Message -->
+     <div id="successMessage" class="hidden mt-6 max-w-3xl bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
+      <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+       <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+       </svg>
+      </div>
+      <div>
+       <p class="font-medium text-green-800">Perkara berhasil ditambahkan!</p>
+       <p class="text-sm text-green-600">Data telah tersimpan ke dalam sistem arsip.</p>
+      </div>
+     </div>
+    </div><!-- About Page -->
+    <div id="page-about" class="page-content p-8 hidden">
+     <header class="mb-8">
+      <h2 class="font-display text-3xl font-bold text-[#8b1f23]">Tentang Kami</h2>
+      <p class="text-slate-600 mt-1">TU Muda Madya - Bidang Tindak Pidana Khusus Kejati Sumbar</p>
+     </header>
+     <div class="max-w-4xl space-y-6"><!-- Logo Section -->
+      <div class="bg-white rounded-xl p-8 shadow-lg border border-slate-100 text-center">
+       <div class="w-48 h-48 mx-auto mb-6"><img src="https://kejari-kotabaru.kejaksaan.go.id/wp-content/uploads/2025/11/logo-pidsus-945x1024-1.png" alt="Logo PIDSUS" loading="lazy" class="w-full h-full object-contain" onerror="console.error('Image failed to load:', this.src); this.style.background='#8b1f23'; this.alt='Logo unavailable';">
+       </div>
+       <div class="bg-gradient-to-r from-[#8b1f23] to-[#a62529] text-white py-3 px-6 rounded-lg inline-block">
+        <p class="font-display text-2xl font-bold">PIDSUS BISA, PASTI CERDAS</p>
+       </div>
+      </div><!-- Profile Section -->
+      <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-100">
+       <h3 class="font-display text-xl font-semibold text-[#8b1f23] mb-4 flex items-center gap-3"><span class="text-2xl">👥</span> Profil</h3>
+       <p class="text-slate-700 leading-relaxed text-justify">Kami adalah <strong>TU MUDA MADYA</strong>, pegawai pelaksana pada Bidang Tindak Pidana Khusus (PIDSUS) Kejaksaan Tinggi Sumatera Barat. Kami hadir sebagai bagian penting dalam mendukung pelaksanaan tugas dan fungsi penegakan hukum, khususnya dalam penanganan tindak pidana khusus yang profesional, akuntabel, dan berintegritas.</p>
+       <p class="text-slate-700 leading-relaxed text-justify mt-4">Sebagai garda pendukung di bidang PIDSUS, kami berkomitmen untuk terus berinovasi, meningkatkan kompetensi, serta memberikan kontribusi nyata demi terwujudnya penegakan keadilan yang berkualitas, terpercaya, dan berorientasi pada kepentingan masyarakat.</p>
+       <p class="text-slate-700 leading-relaxed text-justify mt-4">Dalam menjalankan peran tersebut, TU Muda Madya tidak hanya berfokus pada pelaksanaan tugas administratif dan teknis, tetapi juga pada penguatan sistem kerja, kolaborasi, serta adaptasi terhadap perkembangan zaman dan teknologi.</p>
+      </div><!-- Vision Section -->
+      <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 shadow-lg border border-blue-100">
+       <h3 class="font-display text-xl font-semibold text-[#8b1f23] mb-4 flex items-center gap-3"><span class="text-2xl">🎯</span> Visi Kami</h3>
+       <p class="text-slate-700 leading-relaxed text-justify">Mewujudkan peningkatan kemakmuran dan profesionalisme pegawai Kejaksaan, khususnya pada jabatan pelaksana, serta membuka peluang pengembangan karier hingga menjadi jabatan struktural di masa depan.</p>
+      </div><!-- Mission Section -->
+      <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 shadow-lg border border-green-100">
+       <h3 class="font-display text-xl font-semibold text-[#8b1f23] mb-4 flex items-center gap-3"><span class="text-2xl">🚀</span> Misi Kami</h3>
+       <div class="space-y-4">
+        <div class="flex items-start gap-3">
+         <div class="w-8 h-8 bg-[#8b1f23] text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+          1
+         </div>
+         <p class="text-slate-700 leading-relaxed text-justify">Memberikan layanan dan pembantuan penegakan keadilan yang berkualitas tinggi, efektif, dan bertanggung jawab di lingkungan Bidang Tindak Pidana Khusus.</p>
+        </div>
+        <div class="flex items-start gap-3">
+         <div class="w-8 h-8 bg-[#8b1f23] text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+          2
+         </div>
+         <p class="text-slate-700 leading-relaxed text-justify">Meningkatkan kapasitas, kesejahteraan, dan profesionalisme pegawai pelaksana sebagai bagian integral dari sistem penegakan hukum.</p>
+        </div>
+        <div class="flex items-start gap-3">
+         <div class="w-8 h-8 bg-[#8b1f23] text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+          3
+         </div>
+         <p class="text-slate-700 leading-relaxed text-justify">Mendorong terciptanya tata kelola kerja yang transparan, akuntabel, dan berintegritas.</p>
+        </div>
+        <div class="flex items-start gap-3">
+         <div class="w-8 h-8 bg-[#8b1f23] text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+          4
+         </div>
+         <p class="text-slate-700 leading-relaxed text-justify">Terus berinovasi dan beradaptasi dengan perkembangan zaman, termasuk pemanfaatan teknologi dan sistem kerja modern.</p>
+        </div>
+        <div class="flex items-start gap-3">
+         <div class="w-8 h-8 bg-[#8b1f23] text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+          5
+         </div>
+         <p class="text-slate-700 leading-relaxed text-justify">Menjadi pendukung yang andal dalam mewujudkan penegakan hukum yang adil, humanis, dan berorientasi pada kepentingan publik.</p>
+        </div>
+       </div>
+      </div><!-- Footer Quote -->
+      <div class="bg-gradient-to-r from-[#8b1f23] to-[#a62529] rounded-xl p-6 shadow-lg text-white text-center">
+       <p class="text-lg italic mb-2">"Bersama TU Muda Madya, kami berkomitmen untuk mendukung penegakan hukum yang profesional dan berintegritas"</p>
+       <p class="text-sm text-slate-200">Bidang Tindak Pidana Khusus - Kejaksaan Tinggi Sumatera Barat</p>
+      </div>
+     </div>
+    </div><!-- Case Detail Modal -->
+    <div id="caseDetailModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+     <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90%] overflow-y-auto">
+      <div class="p-6 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white">
+       <h3 class="font-display text-xl font-bold text-[#8b1f23]">Detail Perkara</h3><button onclick="closeCaseDetail()" class="w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center transition-colors">
+        <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg></button>
+      </div>
+      <div id="caseDetailContent" class="p-6"><!-- Content will be populated dynamically -->
+      </div>
+     </div>
+    </div>
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6">
+      <div class="text-center">
+       <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+       </div>
+       <h3 class="font-display text-xl font-bold text-slate-800 mb-2">Hapus Perkara?</h3>
+       <p class="text-slate-600 mb-6">Apakah Anda yakin ingin menghapus perkara ini? Tindakan ini tidak dapat dibatalkan.</p>
+       <div class="flex gap-3 justify-center"><button onclick="closeDeleteModal()" class="px-6 py-2 bg-slate-100 text-slate-600 rounded-lg font-medium hover:bg-slate-200 transition-colors"> Batal </button> <button id="confirmDeleteBtn" class="px-6 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"> Ya, Hapus </button>
+       </div>
+      </div>
+     </div>
+    </div>
+   </main>
+  </div>
+  <script>
+    // Default configuration
+    const defaultConfig = {
+      institution_name: 'Kejaksaan Tinggi Sumatera Barat',
+      division_name: 'Bidang Tindak Pidana Khusus',
+      primary_color: '#8b1f23',
+      accent_color: '#d4af37',
+      background_color: '#faf8f5',
+      text_color: '#2c1810',
+      surface_color: '#ffffff'
+    };
+    
+    let config = { ...defaultConfig };
+    let allCases = [];
+    let currentYearFilter = 'all';
+    let caseToDelete = null;
+    
+    // Data Handler for Data SDK
+    const dataHandler = {
+      onDataChanged(data) {
+        allCases = data;
+        updateDashboardStats();
+        renderArchiveList();
+      }
+    };
+    
+    // Initialize SDKs
+    async function initApp() {
+      // Initialize Element SDK
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange: async (newConfig) => {
+            config = { ...defaultConfig, ...newConfig };
+            applyConfig();
+          },
+          mapToCapabilities: (cfg) => ({
+            recolorables: [
+              {
+                get: () => cfg.background_color || defaultConfig.background_color,
+                set: (v) => { cfg.background_color = v; window.elementSdk.setConfig({ background_color: v }); }
+              },
+              {
+                get: () => cfg.surface_color || defaultConfig.surface_color,
+                set: (v) => { cfg.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); }
+              },
+              {
+                get: () => cfg.text_color || defaultConfig.text_color,
+                set: (v) => { cfg.text_color = v; window.elementSdk.setConfig({ text_color: v }); }
+              },
+              {
+                get: () => cfg.primary_color || defaultConfig.primary_color,
+                set: (v) => { cfg.primary_color = v; window.elementSdk.setConfig({ primary_color: v }); }
+              },
+              {
+                get: () => cfg.accent_color || defaultConfig.accent_color,
+                set: (v) => { cfg.accent_color = v; window.elementSdk.setConfig({ accent_color: v }); }
+              }
+            ],
+            borderables: [],
+            fontEditable: undefined,
+            fontSizeable: undefined
+          }),
+          mapToEditPanelValues: (cfg) => new Map([
+            ['institution_name', cfg.institution_name || defaultConfig.institution_name],
+            ['division_name', cfg.division_name || defaultConfig.division_name]
+          ])
+        });
+      }
+      
+      // Initialize Data SDK
+      if (window.dataSdk) {
+        const result = await window.dataSdk.init(dataHandler);
+        if (!result.isOk) {
+          console.error('Failed to initialize Data SDK');
+        }
+      }
+      
+      applyConfig();
+    }
+    
+    // Apply configuration to UI
+    function applyConfig() {
+      document.getElementById('institutionDisplay').textContent = config.institution_name || defaultConfig.institution_name;
+      document.getElementById('divisionDisplay').textContent = config.division_name || defaultConfig.division_name;
+      
+      // Apply colors dynamically
+      document.body.style.backgroundColor = config.background_color || defaultConfig.background_color;
+      
+      // Update stat cards and other elements
+      document.querySelectorAll('.stat-card').forEach(el => {
+        el.style.background = `linear-gradient(135deg, ${config.primary_color || defaultConfig.primary_color} 0%, ${adjustColor(config.primary_color || defaultConfig.primary_color, 20)} 100%)`;
+      });
+    }
+    
+    // Adjust color brightness
+    function adjustColor(color, percent) {
+      const num = parseInt(color.replace('#', ''), 16);
+      const amt = Math.round(2.55 * percent);
+      const R = (num >> 16) + amt;
+      const G = (num >> 8 & 0x00FF) + amt;
+      const B = (num & 0x0000FF) + amt;
+      return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+    }
+    
+    // Update dashboard statistics
+    function updateDashboardStats() {
+      const total = allCases.length;
+      
+      // Penyelidikan per tahun
+      const penyelidikan2024 = allCases.filter(c => c.case_type === 'Penyelidikan' && c.year === 2024).length;
+      const penyelidikan2025 = allCases.filter(c => c.case_type === 'Penyelidikan' && c.year === 2025).length;
+      const penyelidikan2026 = allCases.filter(c => c.case_type === 'Penyelidikan' && c.year === 2026).length;
+      
+      // Penyidikan per tahun
+      const penyidikan2024 = allCases.filter(c => c.case_type === 'Penyidikan' && c.year === 2024).length;
+      const penyidikan2025 = allCases.filter(c => c.case_type === 'Penyidikan' && c.year === 2025).length;
+      const penyidikan2026 = allCases.filter(c => c.case_type === 'Penyidikan' && c.year === 2026).length;
+      
+      document.getElementById('statTotal').textContent = total;
+      
+      document.getElementById('statPenyelidikan2024').textContent = penyelidikan2024;
+      document.getElementById('statPenyelidikan2025').textContent = penyelidikan2025;
+      document.getElementById('statPenyelidikan2026').textContent = penyelidikan2026;
+      
+      document.getElementById('statPenyidikan2024').textContent = penyidikan2024;
+      document.getElementById('statPenyidikan2025').textContent = penyidikan2025;
+      document.getElementById('statPenyidikan2026').textContent = penyidikan2026;
+      
+      // Status counts for Penyelidikan
+      const penyelidikanProses = allCases.filter(c => c.case_type === 'Penyelidikan' && c.status === 'Dalam Proses').length;
+      const penyelidikanDihentikan = allCases.filter(c => c.case_type === 'Penyelidikan' && c.status === 'Dihentikan').length;
+      const penyelidikanNaik = allCases.filter(c => c.case_type === 'Penyelidikan' && c.status === 'Naik Penyidikan').length;
+      
+      document.getElementById('statusPenyelidikanProses').textContent = penyelidikanProses;
+      document.getElementById('statusPenyelidikanDihentikan').textContent = penyelidikanDihentikan;
+      document.getElementById('statusPenyelidikanNaik').textContent = penyelidikanNaik;
+      
+      // Status counts for Penyidikan
+      const penyidikanProses = allCases.filter(c => c.case_type === 'Penyidikan' && c.status === 'Dalam Proses').length;
+      const penyidikanDihentikan = allCases.filter(c => c.case_type === 'Penyidikan' && c.status === 'Dihentikan').length;
+      const penyidikanNaik = allCases.filter(c => c.case_type === 'Penyidikan' && c.status === 'Naik PraPenuntutan').length;
+      
+      document.getElementById('statusPenyidikanProses').textContent = penyidikanProses;
+      document.getElementById('statusPenyidikanDihentikan').textContent = penyidikanDihentikan;
+      document.getElementById('statusPenyidikanNaik').textContent = penyidikanNaik;
+      
+      // Recent cases
+      const recentContainer = document.getElementById('recentCases');
+      const recentCases = [...allCases].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5);
+      
+      if (recentCases.length === 0) {
+        recentContainer.innerHTML = '<p class="text-slate-400 text-sm italic">Belum ada perkara terdaftar</p>';
+      } else {
+        recentContainer.innerHTML = recentCases.map(c => `
+          <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition-colors" onclick="showCaseDetail('${c.__backendId}')">
+            <div class="w-10 h-10 bg-[#8b1f23] rounded-lg flex items-center justify-center">
+              <span class="text-white text-sm font-bold">${c.case_number.split('/')[0]}</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-slate-800 truncate">${c.case_name}</p>
+              <p class="text-xs text-slate-500">${c.year} �� ${c.status}</p>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+    
+    // Render archive list
+    function renderArchiveList() {
+      const container = document.getElementById('archiveList');
+      let filteredCases = currentYearFilter === 'all' ? allCases : allCases.filter(c => c.year === parseInt(currentYearFilter));
+      
+      if (filteredCases.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-xl p-8 shadow-lg border border-slate-100 text-center">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="text-3xl">📂</span>
+            </div>
+            <p class="text-slate-500">Belum ada perkara terdaftar${currentYearFilter !== 'all' ? ` untuk tahun ${currentYearFilter}` : ''}</p>
+            <p class="text-slate-400 text-sm mt-1">Klik "Tambah Perkara" untuk menambahkan data baru</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // Group by year
+      const grouped = {};
+      filteredCases.forEach(c => {
+        if (!grouped[c.year]) grouped[c.year] = [];
+        grouped[c.year].push(c);
+      });
+      
+      let html = '';
+      Object.keys(grouped).sort((a, b) => b - a).forEach(year => {
+        html += `
+          <div class="bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden">
+            <div class="bg-gradient-to-r from-[#8b1f23] to-[#a62529] px-6 py-4 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-2xl">📁</span>
+                <h3 class="font-display text-xl font-bold text-white">Tahun ${year}</h3>
+              </div>
+              <span class="bg-white/20 text-white px-3 py-1 rounded-full text-sm font-medium">${grouped[year].length} Perkara</span>
+            </div>
+            <div class="divide-y divide-slate-100">
+              ${grouped[year].map(c => `
+                <div class="folder-item p-4">
+                  <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span class="text-xl">📄</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-2 mb-1">
+                        <span class="font-semibold text-[#8b1f23]">Perkara #${c.case_number}</span>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(c.status)}">${c.status}</span>
+                      </div>
+                      <p class="text-slate-600 text-sm mb-2">${c.case_name}</p>
+                      <p class="text-xs text-slate-400 mb-2">SP: ${c.sp_number} | ${formatDate(c.sp_date)}</p>
+                      
+                      <div class="flex items-center gap-2 mt-3">
+                        <label class="text-xs font-medium text-slate-600">Ubah Status:</label>
+                        <select onchange="updateCaseStatus('${c.__backendId}', this.value)" class="text-xs px-2 py-1 border border-slate-300 rounded focus:ring-2 focus:ring-[#8b1f23] focus:border-transparent outline-none">
+                          <option value="">-- Pilih Status --</option>
+                          ${c.case_type === 'Penyelidikan' ? `
+                            <option value="Dalam Proses" ${c.status === 'Dalam Proses' ? 'selected' : ''}>Dalam Proses</option>
+                            <option value="Dihentikan" ${c.status === 'Dihentikan' ? 'selected' : ''}>Dihentikan</option>
+                            <option value="Naik Penyidikan" ${c.status === 'Naik Penyidikan' ? 'selected' : ''}>Naik Penyidikan</option>
+                          ` : `
+                            <option value="Dalam Proses" ${c.status === 'Dalam Proses' ? 'selected' : ''}>Dalam Proses</option>
+                            <option value="Dihentikan" ${c.status === 'Dihentikan' ? 'selected' : ''}>Dihentikan</option>
+                            <option value="Naik PraPenuntutan" ${c.status === 'Naik PraPenuntutan' ? 'selected' : ''}>Naik PraPenuntutan</option>
+                          `}
+                        </select>
+                        <button onclick="showCaseDetail('${c.__backendId}')" class="text-xs px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                          Detail
+                        </button>
+                      </div>
+                    </div>
+                    <button onclick="confirmDelete('${c.__backendId}')" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    // Get status color class
+    function getStatusColor(status) {
+      const colors = {
+        'Dalam Proses': 'bg-blue-100 text-blue-700',
+        'Dihentikan': 'bg-red-100 text-red-700',
+        'Naik Penyidikan': 'bg-green-100 text-green-700',
+        'Naik PraPenuntutan': 'bg-purple-100 text-purple-700'
+      };
+      return colors[status] || 'bg-slate-100 text-slate-700';
+    }
+    
+    // Update status options based on case type
+    function updateStatusOptions() {
+      const caseType = document.getElementById('caseType').value;
+      const statusSelect = document.getElementById('caseStatus');
+      
+      statusSelect.innerHTML = '<option value="">Pilih Status</option>';
+      
+      if (caseType === 'Penyelidikan') {
+        statusSelect.innerHTML += `
+          <option value="Dalam Proses">Dalam Proses</option>
+          <option value="Dihentikan">Dihentikan</option>
+          <option value="Naik Penyidikan">Naik Penyidikan</option>
+        `;
+      } else if (caseType === 'Penyidikan') {
+        statusSelect.innerHTML += `
+          <option value="Dalam Proses">Dalam Proses</option>
+          <option value="Dihentikan">Dihentikan</option>
+          <option value="Naik PraPenuntutan">Naik PraPenuntutan</option>
+        `;
+      }
+    }
+    
+    // Format date
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    
+    // Show page
+    function showPage(pageName) {
+      // Hide all pages
+      document.querySelectorAll('.page-content').forEach(page => {
+        page.classList.add('hidden');
+      });
+      
+      // Show selected page
+      const selectedPage = document.getElementById(`page-${pageName}`);
+      if (selectedPage) {
+        selectedPage.classList.remove('hidden');
+        selectedPage.classList.add('animate-fade-in');
+      }
+      
+      // Update sidebar active state
+      document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.page === pageName) {
+          item.classList.add('active');
+        }
+      });
+    }
+    
+    // Filter by year
+    function filterYear(year) {
+      currentYearFilter = year;
+      
+      // Update tab styles
+      document.querySelectorAll('.year-tab').forEach(tab => {
+        if (tab.dataset.year == year) {
+          tab.classList.remove('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
+          tab.classList.add('bg-[#8b1f23]', 'text-white');
+        } else {
+          tab.classList.add('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
+          tab.classList.remove('bg-[#8b1f23]', 'text-white');
+        }
+      });
+      
+      renderArchiveList();
+    }
+    
+    // Show case detail
+    function showCaseDetail(caseId) {
+      const caseData = allCases.find(c => c.__backendId === caseId);
+      if (!caseData) return;
+      
+      const documents = caseData.documents ? caseData.documents.split('\n').filter(d => d.trim()) : [];
+      
+      const content = `
+        <div class="space-y-6">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 bg-[#8b1f23] rounded-xl flex items-center justify-center">
+              <span class="text-white text-2xl font-bold">${caseData.case_number.split('/')[0]}</span>
+            </div>
+            <div>
+              <h4 class="font-display text-xl font-bold text-[#8b1f23]">Perkara #${caseData.case_number}</h4>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-700">${caseData.case_type}</span>
+                <span class="px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(caseData.status)}">${caseData.status}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <label class="text-sm font-medium text-slate-500">Nama Perkara</label>
+            <p class="text-slate-800 mt-1">${caseData.case_name}</p>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-medium text-slate-500">Tahun</label>
+              <p class="text-slate-800 mt-1">${caseData.year}</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-slate-500">Jenis Perkara</label>
+              <p class="text-slate-800 mt-1">${caseData.case_type}</p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-medium text-slate-500">Nomor SP</label>
+              <p class="text-slate-800 mt-1">${caseData.sp_number}</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-slate-500">Tanggal SP</label>
+              <p class="text-slate-800 mt-1">${formatDate(caseData.sp_date)}</p>
+            </div>
+          </div>
+          
+          <div>
+            <label class="text-sm font-medium text-slate-500 mb-2 block">Dokumen Terkait</label>
+            ${documents.length > 0 ? `
+              <div class="space-y-2">
+                ${documents.map((doc, i) => `
+                  <div class="doc-item flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                    <div class="w-8 h-8 bg-amber-100 rounded flex items-center justify-center">
+                      <span class="text-sm">${String(i + 1).padStart(2, '0')}</span>
+                    </div>
+                    <span class="text-slate-700">${doc.replace(/^[-•]\s*/, '')}</span>
+                  </div>
+                `).join('')}
+              </div>
+            ` : '<p class="text-slate-400 italic">Tidak ada dokumen terdaftar</p>'}
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('caseDetailContent').innerHTML = content;
+      document.getElementById('caseDetailModal').classList.remove('hidden');
+    }
+    
+    // Close case detail
+    function closeCaseDetail() {
+      document.getElementById('caseDetailModal').classList.add('hidden');
+    }
+    
+    // Confirm delete
+    function confirmDelete(caseId) {
+      caseToDelete = caseId;
+      document.getElementById('deleteModal').classList.remove('hidden');
+      
+      document.getElementById('confirmDeleteBtn').onclick = async () => {
+        if (caseToDelete && window.dataSdk) {
+          const caseData = allCases.find(c => c.__backendId === caseToDelete);
+          if (caseData) {
+            const result = await window.dataSdk.delete(caseData);
+            if (!result.isOk) {
+              console.error('Failed to delete case');
+            }
+          }
+        }
+        closeDeleteModal();
+      };
+    }
+    
+    // Close delete modal
+    function closeDeleteModal() {
+      caseToDelete = null;
+      document.getElementById('deleteModal').classList.add('hidden');
+    }
+    
+    // Update case status
+    async function updateCaseStatus(caseId, newStatus) {
+      if (!newStatus || !window.dataSdk) return;
+      
+      const caseData = allCases.find(c => c.__backendId === caseId);
+      if (!caseData) return;
+      
+      // Update the status
+      caseData.status = newStatus;
+      
+      const result = await window.dataSdk.update(caseData);
+      if (!result.isOk) {
+        console.error('Failed to update case status');
+      }
+    }
+    
+    // Perform search
+    function performSearch() {
+      const keyword = document.getElementById('searchKeyword').value.toLowerCase();
+      const year = document.getElementById('searchYear').value;
+      const status = document.getElementById('searchStatus').value;
+      
+      let results = allCases.filter(c => {
+        const matchKeyword = !keyword || 
+          c.case_name.toLowerCase().includes(keyword) || 
+          c.case_number.toLowerCase().includes(keyword) ||
+          c.sp_number.toLowerCase().includes(keyword);
+        const matchYear = !year || c.year === parseInt(year);
+        const matchStatus = !status || c.status === status;
+        return matchKeyword && matchYear && matchStatus;
+      });
+      
+      const container = document.getElementById('searchResults');
+      
+      if (results.length === 0) {
+        container.innerHTML = `
+          <div class="bg-slate-50 rounded-xl p-8 text-center">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <p class="text-slate-500">Tidak ditemukan perkara yang sesuai</p>
+            <p class="text-slate-400 text-sm mt-1">Coba ubah kriteria pencarian</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = `
+        <p class="text-sm text-slate-500 mb-4">Ditemukan ${results.length} perkara</p>
+        <div class="space-y-3">
+          ${results.map(c => `
+            <div class="bg-white rounded-xl p-4 shadow border border-slate-100 cursor-pointer hover:shadow-lg transition-shadow" onclick="showCaseDetail('${c.__backendId}')">
+              <div class="flex items-start gap-4">
+                <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span class="text-xl">📄</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="font-semibold text-[#8b1f23]">Perkara #${c.case_number}</span>
+                    <span class="px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(c.status)}">${c.status}</span>
+                  </div>
+                  <p class="text-slate-600 text-sm mb-1">${c.case_name}</p>
+                  <p class="text-xs text-slate-400">Tahun ${c.year} | SP: ${c.sp_number}</p>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+    
+    // Add case form submission
+    document.getElementById('addCaseForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (allCases.length >= 999) {
+        showMessage('Batas maksimum 999 perkara telah tercapai. Hapus beberapa perkara untuk menambahkan yang baru.', 'error');
+        return;
+      }
+      
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Menyimpan...';
+      
+      const year = document.getElementById('caseYear').value;
+      const yearCases = allCases.filter(c => c.year === parseInt(year));
+      const caseNumber = `${String(yearCases.length + 1).padStart(2, '0')}/${year}`;
+      
+      const newCase = {
+        id: `case-${Date.now()}`,
+        case_number: caseNumber,
+        case_name: document.getElementById('caseName').value,
+        year: parseInt(year),
+        sp_number: document.getElementById('spNumber').value,
+        sp_date: document.getElementById('spDate').value,
+        case_type: document.getElementById('caseType').value,
+        status: document.getElementById('caseStatus').value,
+        documents: document.getElementById('caseDocuments').value,
+        created_at: new Date().toISOString()
+      };
+      
+      if (window.dataSdk) {
+        const result = await window.dataSdk.create(newCase);
+        if (result.isOk) {
+          document.getElementById('successMessage').classList.remove('hidden');
+          resetForm();
+          setTimeout(() => {
+            document.getElementById('successMessage').classList.add('hidden');
+          }, 3000);
+        } else {
+          console.error('Failed to save case');
+        }
+      }
+      
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Simpan Perkara';
+    });
+    
+    // Reset form
+    function resetForm() {
+      document.getElementById('addCaseForm').reset();
+    }
+    
+    // Show message
+    function showMessage(text, type) {
+      const msg = document.getElementById('successMessage');
+      if (type === 'error') {
+        msg.className = 'mt-6 max-w-3xl bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3';
+        msg.innerHTML = `
+          <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </div>
+          <div>
+            <p class="font-medium text-red-800">Error</p>
+            <p class="text-sm text-red-600">${text}</p>
+          </div>
+        `;
+      }
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 5000);
+    }
+    
+    // Close modals on outside click
+    document.getElementById('caseDetailModal').addEventListener('click', (e) => {
+      if (e.target.id === 'caseDetailModal') closeCaseDetail();
+    });
+    
+    document.getElementById('deleteModal').addEventListener('click', (e) => {
+      if (e.target.id === 'deleteModal') closeDeleteModal();
+    });
+    
+    // Initialize app
+    initApp();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c2d5fbc9678cb36',t:'MTc2OTIzNTA5Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

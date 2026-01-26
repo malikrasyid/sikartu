@@ -1,0 +1,66 @@
+body {
+  box-sizing: border-box;
+}
+.font-display { font-family: 'Playfair Display', serif; }
+.font-body { font-family: 'Source Sans 3', sans-serif; }
+
+.sidebar-item {
+  transition: all 0.2s ease;
+}
+.sidebar-item:hover {
+  background: rgba(212, 175, 55, 0.1);
+  border-left: 3px solid #d4af37;
+}
+.sidebar-item.active {
+  background: rgba(212, 175, 55, 0.15);
+  border-left: 3px solid #d4af37;
+}
+
+.card-hover {
+  transition: all 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 31, 35, 0.15);
+}
+
+.folder-item {
+  transition: all 0.2s ease;
+}
+.folder-item:hover {
+  background: #f8fafc;
+}
+
+.doc-item {
+  transition: all 0.2s ease;
+}
+.doc-item:hover {
+  background: #fef3c7;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #8b1f23 0%, #a62529 100%);
+}
+
+.logo-glow {
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.3));
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #e2e8f0;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 3px;
+}
