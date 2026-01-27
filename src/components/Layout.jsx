@@ -1,11 +1,11 @@
+// src/components/Layout.jsx
 import Sidebar from './Sidebar';
 
 export default function Layout({ children }) {
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-gray-50"> {/* Moved bg-gray-50 here */}
       <Sidebar />
-      {/* Main Content Area: Pushes content to the right of the 64-width sidebar */}
-      <main className="flex-1 ml-72 p-8 bg-gray-50 min-h-screen">
+      <main className="flex-1 ml-64 p-8">
         {children}
       </main>
     </div>

@@ -1,126 +1,97 @@
-import React from 'react';
+// FIX: Removed icon imports from lucide-react
+import { } from 'lucide-react'; 
 
 export default function TentangKami() {
-  
-  // Handle case where image fails to load
-  const handleImageError = (e) => {
-    e.target.style.display = 'none'; // Hide the broken image
-    e.target.parentElement.classList.add('bg-[#8b1f23]', 'flex', 'items-center', 'justify-center');
-    // Create a fallback text element
-    const fallbackText = document.createElement('span');
-    fallbackText.className = 'text-white font-bold text-xs';
-    fallbackText.innerText = 'Logo Unavailable';
-    e.target.parentElement.appendChild(fallbackText);
-  };
-
   return (
-    <div className="page-content animate-fade-in">
+    <div className="w-full animate-fade-in space-y-6">
       
-      {/* HEADER */}
-      <header className="mb-8">
-        <h2 className="font-display text-3xl font-bold text-[#8b1f23]">Tentang Kami</h2>
-        <p className="text-slate-600 mt-1">TU Muda Madya - Bidang Tindak Pidana Khusus Kejati Sumbar</p>
-      </header>
+      {/* HEADER SECTION */}
+      <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#8b1f23]/10 to-transparent rounded-bl-full -mr-16 -mt-16 pointer-events-none"></div>
 
-      <div className="max-w-4xl space-y-6">
-        
-        {/* LOGO SECTION */}
-        <div className="bg-white rounded-xl p-8 shadow-lg border border-slate-100 text-center">
-          <div className="w-48 h-48 mx-auto mb-6">
+        <div className="w-32 h-32 md:w-40 md:h-40 shrink-0 bg-gradient-to-br from-[#8b1f23] to-[#5c1416] p-1 rounded-full shadow-lg">
+          <div className="w-full h-full bg-white rounded-full flex items-center justify-center p-2">
             <img 
               src="https://kejari-kotabaru.kejaksaan.go.id/wp-content/uploads/2025/11/logo-pidsus-945x1024-1.png" 
               alt="Logo PIDSUS" 
-              loading="lazy" 
-              className="w-full h-full object-contain" 
-              onError={handleImageError}
+              className="w-full h-full object-contain"
             />
           </div>
-          <div className="bg-gradient-to-r from-[#8b1f23] to-[#a62529] text-white py-3 px-6 rounded-lg inline-block shadow-md">
-            <p className="font-display text-2xl font-bold tracking-wide">PIDSUS BISA, PASTI CERDAS</p>
+        </div>
+
+        <div className="text-center md:text-left z-10">
+          <h1 className="font-display text-4xl font-bold text-[#8b1f23] mb-2">
+            Tentang Kami
+          </h1>
+          <p className="text-xl text-slate-600 font-medium">
+            TU Muda Madya - Bidang Tindak Pidana Khusus
+          </p>
+          <p className="text-slate-500 mt-2 font-display italic text-lg">
+            "PIDSUS BISA, PASTI CERDAS"
+          </p>
+          <p className="text-sm text-slate-400 mt-1">
+            Kejaksaan Tinggi Sumatera Barat
+          </p>
+        </div>
+      </div>
+
+      {/* GRID SECTION: PROFIL & VISI */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+        
+        {/* PROFIL CARD */}
+        <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 h-full flex flex-col">
+          {/* REMOVED ICON: Just the text now, colored in brand red */}
+          <h2 className="font-display text-2xl font-bold text-[#8b1f23] mb-4">Profil</h2>
+          
+          <div className="prose prose-slate text-slate-600 leading-relaxed flex-1">
+            <p>
+              <strong className="text-[#8b1f23]">TU MUDA MADYA</strong> merupakan staf tata usaha yang bertugas pada Bidang Tindak Pidana Khusus.
+            </p>
+            <p className="mt-4">
+              Kami berperan dalam mendukung kelancaran administrasi dan manajemen perkara, memastikan setiap proses berjalan akuntabel, transparan, dan sesuai dengan Standar Operasional Prosedur (SOP) yang berlaku di lingkungan Kejaksaan Tinggi Sumatera Barat.
+            </p>
           </div>
         </div>
 
-        {/* PROFILE SECTION */}
-        <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-100">
-          <h3 className="font-display text-xl font-semibold text-[#8b1f23] mb-4 flex items-center gap-3">
-            <span className="text-2xl">👥</span> Profil
-          </h3>
-          <p className="text-slate-700 leading-relaxed text-justify">
-            Kami adalah <strong>TU MUDA MADYA</strong>, pegawai pelaksana pada Bidang Tindak Pidana Khusus (PIDSUS) Kejaksaan Tinggi Sumatera Barat. Kami hadir sebagai bagian penting dalam mendukung pelaksanaan tugas dan fungsi penegakan hukum, khususnya dalam penanganan tindak pidana khusus yang profesional, akuntabel, dan berintegritas.
-          </p>
-          <p className="text-slate-700 leading-relaxed text-justify mt-4">
-            Sebagai garda pendukung di bidang PIDSUS, kami berkomitmen untuk terus berinovasi, meningkatkan kompetensi, serta memberikan kontribusi nyata demi terwujudnya penegakan keadilan yang berkualitas, terpercaya, dan berorientasi pada kepentingan masyarakat.
-          </p>
-          <p className="text-slate-700 leading-relaxed text-justify mt-4">
-            Dalam menjalankan peran tersebut, TU Muda Madya tidak hanya berfokus pada pelaksanaan tugas administratif dan teknis, tetapi juga pada penguatan sistem kerja, kolaborasi, serta adaptasi terhadap perkembangan zaman dan teknologi.
-          </p>
-        </div>
-
-        {/* VISION SECTION */}
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 shadow-lg border border-blue-100">
-          <h3 className="font-display text-xl font-semibold text-[#8b1f23] mb-4 flex items-center gap-3">
-            <span className="text-2xl">🎯</span> Visi Kami
-          </h3>
-          <p className="text-slate-700 leading-relaxed text-justify">
-            Mewujudkan peningkatan kemakmuran dan profesionalisme pegawai Kejaksaan, khususnya pada jabatan pelaksana, serta membuka peluang pengembangan karier hingga menjadi jabatan struktural di masa depan.
-          </p>
-        </div>
-
-        {/* MISSION SECTION */}
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 shadow-lg border border-green-100">
-          <h3 className="font-display text-xl font-semibold text-[#8b1f23] mb-4 flex items-center gap-3">
-            <span className="text-2xl">🚀</span> Misi Kami
-          </h3>
-          <div className="space-y-4">
-            
-            <MissionItem number="1">
-              Memberikan layanan dan pembantuan penegakan keadilan yang berkualitas tinggi, efektif, dan bertanggung jawab di lingkungan Bidang Tindak Pidana Khusus.
-            </MissionItem>
-            
-            <MissionItem number="2">
-              Meningkatkan kapasitas, kesejahteraan, dan profesionalisme pegawai pelaksana sebagai bagian integral dari sistem penegakan hukum.
-            </MissionItem>
-            
-            <MissionItem number="3">
-              Mendorong terciptanya tata kelola kerja yang transparan, akuntabel, dan berintegritas.
-            </MissionItem>
-            
-            <MissionItem number="4">
-              Terus berinovasi dan beradaptasi dengan perkembangan zaman, termasuk pemanfaatan teknologi dan sistem kerja modern.
-            </MissionItem>
-            
-            <MissionItem number="5">
-              Menjadi pendukung yang andal dalam mewujudkan penegakan hukum yang adil, humanis, dan berorientasi pada kepentingan publik.
-            </MissionItem>
-
+        {/* VISI CARD */}
+        <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 h-full flex flex-col">
+          {/* REMOVED ICON */}
+          <h2 className="font-display text-2xl font-bold text-[#8b1f23] mb-4">Visi</h2>
+          
+          <div className="flex items-center justify-center flex-1 bg-gradient-to-br from-[#8b1f23] to-[#5c1416] text-white p-8 rounded-xl shadow-inner text-center">
+            <p className="text-lg font-medium italic leading-relaxed">
+              "Menjadi penyelenggara administrasi peradilan yang profesional, modern, dan terpercaya dalam mendukung penegakan hukum tindak pidana khusus yang berkualitas."
+            </p>
           </div>
         </div>
 
-        {/* FOOTER QUOTE */}
-        <div className="bg-gradient-to-r from-[#8b1f23] to-[#a62529] rounded-xl p-6 shadow-lg text-white text-center transform hover:scale-[1.01] transition duration-300">
-          <p className="text-lg italic mb-2">
-            "Bersama TU Muda Madya, kami berkomitmen untuk mendukung penegakan hukum yang profesional dan berintegritas"
-          </p>
-          <p className="text-sm text-slate-200 opacity-90">
-            Bidang Tindak Pidana Khusus - Kejaksaan Tinggi Sumatera Barat
-          </p>
+      </div>
+
+      {/* MISI SECTION */}
+      <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 w-full">
+        {/* REMOVED ICON */}
+        <h2 className="font-display text-2xl font-bold text-[#8b1f23] mb-6">Misi</h2>
+        
+        <div className="grid grid-cols-1 gap-2">
+          {[
+            "Meningkatkan kualitas pelayanan administrasi perkara yang cepat, tepat, dan akurat.",
+            "Mengembangkan sistem pengelolaan data berbasis teknologi informasi.",
+            "Meningkatkan kompetensi sumber daya manusia dalam bidang administrasi kejaksaan.",
+            "Mewujudkan tertib administrasi dalam penanganan perkara tindak pidana khusus.",
+            "Mendukung terciptanya zona integritas menuju Wilayah Bebas dari Korupsi (WBK)."
+          ].map((item, index) => (
+            <div key={index} className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100 group">
+              <div className="mt-0.5 shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 font-bold text-xs group-hover:bg-[#8b1f23] group-hover:text-white transition-colors">
+                {index + 1}
+              </div>
+              <p className="text-slate-700 leading-snug font-medium">
+                {item}
+              </p>
+            </div>
+          ))}
         </div>
-
       </div>
-    </div>
-  );
-}
 
-// Helper Component for Mission Items to keep code clean
-function MissionItem({ number, children }) {
-  return (
-    <div className="flex items-start gap-3">
-      <div className="w-8 h-8 bg-[#8b1f23] text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold shadow-sm">
-        {number}
-      </div>
-      <p className="text-slate-700 leading-relaxed text-justify">
-        {children}
-      </p>
     </div>
   );
 }

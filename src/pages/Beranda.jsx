@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getPerkara } from '../services/perkaraService';
-import { Lock as LockIcon, Search, Scale, FileText, AlertCircle, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Lock as LockIcon, Search, Scale, FileText, LogOut } from 'lucide-react';
 import LoginModal from '../components/LoginModal';
 
 export default function Beranda() {
@@ -20,6 +20,13 @@ export default function Beranda() {
   useEffect(() => {
     calculateStats();
   }, []);
+
+  const handleLogout = () => {
+    if (window.confirm('Apakah anda yakin ingin keluar dari mode Admin?')) {
+      localStorage.removeItem('token');
+      window.location.reload(); // Refresh to reset state
+    }
+  };
 
   const calculateStats = async () => {
     try {
@@ -52,22 +59,13 @@ export default function Beranda() {
           return; // Skip if it's neither
         }
 
-        if (yearTarget[year] !== undefined) {
-          yearTarget[year]++;
-        }
+        if (yearTarget[year] !== undefined) yearTarget[year]++;
 
         switch (status) {
-          case 'proses':
-            statusTarget.proses++;
-            break;
-          case 'ditangguhkan':
-            statusTarget.dihentikan++;
-            break;
-          case 'selesai':
-            statusTarget.naik++;
-            break;
-          default:
-            break;
+          case 'proses': statusTarget.proses++; break;
+          case 'ditangguhkan': statusTarget.dihentikan++; break;
+          case 'selesai': statusTarget.naik++; break;
+          default: break;
         }
       });
 
@@ -102,9 +100,21 @@ export default function Beranda() {
               <span>Login Admin</span>
             </button>
           ) : (
-            <div className="flex items-center gap-2 px-5 py-2.5 bg-green-100 text-green-800 rounded-full font-medium border border-green-200 shadow-sm cursor-default">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span>Admin Mode Aktif</span>
+            <div className="flex items-center gap-3">
+              {/* Admin Badge */}
+              <div className="flex items-center gap-2 px-5 py-2.5 bg-green-100 text-green-800 rounded-full font-medium border border-green-200 shadow-sm cursor-default">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span>Admin Mode Aktif</span>
+              </div>
+              
+              {/* LOGOUT BUTTON */}
+              <button 
+                onClick={handleLogout}
+                title="Logout"
+                className="p-2.5 bg-white border border-slate-200 text-slate-400 rounded-full hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all shadow-sm group"
+              >
+                <LogOut size={20} className="group-hover:scale-110 transition-transform" />
+              </button>
             </div>
           )}
         </div>
@@ -217,6 +227,11 @@ export default function Beranda() {
           )}
         </div>
       </div>
+
+      {isLoginOpen && (
+        <LoginModal closeModal={() => setIsLoginOpen(false)} />
+      )}
+
     </div>
   );
 }

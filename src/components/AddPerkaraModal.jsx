@@ -188,7 +188,6 @@ export default function AddPerkaraModal({ closeModal, refreshData }) {
                     <option value="">Pilih Jenis Perkara</option>
                     <option value="Penyelidikan">Penyelidikan</option>
                     <option value="Penyidikan">Penyidikan</option>
-                    <option value="Pidana Umum">Pidana Umum</option>
                   </select>
                 </div>
                 <div>
@@ -202,9 +201,9 @@ export default function AddPerkaraModal({ closeModal, refreshData }) {
                     onChange={handleChange}
                   >
                     <option value="">Pilih Status</option>
-                    <option value="Proses">Proses</option>
-                    <option value="Selesai">Selesai</option>
-                    <option value="Ditangguhkan">Ditangguhkan</option>
+                    <option value="Dalam Proses">Dalam Proses</option>
+                    <option value="Dihentikan">Dihentikan</option>
+                    <option value="Naik Penyidikan">Naik Penyidikan</option>
                   </select>
                 </div>
               </div>

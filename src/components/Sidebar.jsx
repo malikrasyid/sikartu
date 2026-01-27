@@ -14,10 +14,10 @@ export default function Sidebar() {
 
   return (
     // Replaced w-64 with w-72 as per your code
-    <aside className="w-72 h-screen bg-gradient-to-b from-[#8b1f23] to-[#5c1416] text-white flex flex-col shadow-2xl fixed left-0 top-0 z-50">
+    <aside className="w-64 h-screen bg-gradient-to-b from-[#8b1f23] to-[#5c1416] text-white flex flex-col shadow-2xl fixed left-0 top-0 z-50">
       
       {/* --- YOUR LOGO SECTION START --- */}
-      {/* <div className="p-6 border-b border-white/10">
+      <div className="p-6 border-b border-white/10">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 shrink-0 relative">
             <img 
@@ -38,22 +38,18 @@ export default function Sidebar() {
         </div>
         
         <div className="mt-4 pt-4 border-t border-white/10">
-          <p className="text-sm font-medium text-white">
+          <p className="text-xs font-medium text-white">
             Kejaksaan Tinggi Sumatera Barat
           </p>
           <p className="text-xs text-slate-400 mt-0.5">
             Bidang Tindak Pidana Khusus
           </p>
         </div>
-      </div> */}
+      </div>
       {/* --- YOUR LOGO SECTION END --- */}
 
       {/* Navigation Menu */}
-      <nav className="flex-1 py-6 space-y-2 overflow-y-auto">
-        <div className="px-6 pb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-          Menu Utama
-        </div>
-        
+      <nav className="flex-1 py-6 space-y-2 overflow-y-auto">        
         <Link to="/" className={getLinkClass('/')}>
           <Home size={20} className="text-[#d4af37]" /> 
           <span>Beranda</span>
