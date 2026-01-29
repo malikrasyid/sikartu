@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePerkara } from '../context/PerkaraContext';
 import {
-  Lock as LockIcon, Search, Scale, FileText, LogOut, 
-  FileWarning, CheckCircle, XCircle, Clock, 
-  ChevronRight, TrendingUp, Activity
+  Lock as LockIcon, Search, Scale, FileText, LogOut, Activity,
+  FileWarning, CheckCircle, XCircle, Clock, ShieldCheck
   } from 'lucide-react';
 import LoginModal from '../components/LoginModal';
 import LogoutModal from '../components/LogoutModal';
@@ -119,66 +118,47 @@ return (
           <h2 className="font-display text-3xl font-bold text-[#8b1f23]">Dashboard</h2>
           <p className="text-slate-600 mt-1">Ringkasan data arsip perkara tindak pidana khusus</p>
         </div>
-
         <div>
           {!isLoggedIn ? (
             <button 
               onClick={() => setIsLoginOpen(true)}
-              className="group flex items-center gap-2 px-5 py-2.5 bg-white border border-[#8b1f23] text-[#8b1f23] rounded-full font-medium shadow-sm hover:bg-[#8b1f23] hover:text-white transition-all duration-300"
+              className="group flex items-center gap-2 px-3 py-1.5 bg-white border border-[#8b1f23] text-[#8b1f23] rounded-full font-medium shadow-sm hover:bg-[#8b1f23] hover:text-white transition-all duration-300"
             >
               <LockIcon size={18} className="group-hover:text-white transition-colors" />
               <span>Login Admin</span>
             </button>
           ) : (
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-5 py-2.5 bg-green-100 text-green-800 rounded-full font-medium border border-green-200 shadow-sm cursor-default">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span>Admin Mode Aktif</span>
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm font-medium border border-green-200 shadow-sm cursor-default select-none">
+                <ShieldCheck size={18} className="text-green-600" />
+                <span>Admin</span>
               </div>
+
               <button 
                 onClick={handleLogoutClick}
-                className="p-2.5 bg-white border border-slate-200 text-slate-400 rounded-full hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all shadow-sm group"
+                className="flex items-center gap-2 px-3 py-1.5 bg-white border border-red-200 text-red-600 rounded-full font-medium shadow-sm hover:bg-red-600 hover:text-white hover:border-red-600 transition-all duration-300 group"
                 title="Keluar"
               >
-                <LogOut size={20} className="group-hover:scale-110 transition-transform" />
+                <LogOut size={18} className="group-hover:stroke-white transition-colors" />
               </button>
             </div>
           )}
         </div>
       </header>
 
-      {/* TOTAL STATS HERO CARD */}
-      <div className="bg-gradient-to-r from-[#8b1f23] to-[#5c1416] rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
-        <div className="relative z-10 flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-white/80 mb-2">
-              <Activity size={20} />
-              <p className="text-sm font-medium uppercase tracking-wider">Total Seluruh Perkara</p>
-            </div>
-            {loading ? (
-                <div className="h-14 w-24 bg-white/20 rounded animate-pulse"></div>
-            ) : (
-                <p className="text-6xl font-display font-bold">
-                  <CountUp end={stats.total} duration={2000} />
-                </p>
-            )}
-          </div>
-          <div className="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/10 shadow-inner">
-            <Scale className="w-10 h-10 text-[#d4af37]" />
-          </div>
-        </div>
-      </div>
-
-      {/* --- STATS GRID SECTIONS --- */}
-      
+      {/* --- STATS GRID SECTIONS --- */}      
       {/* 1. LAPORAN PENGADUAN */}
       <section>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-amber-100 text-amber-700 rounded-lg">
-            <FileWarning size={20} />
+        <div className="mb-4">
+          <div className="inline-flex items-center gap-3 bg-gradient-to-r from-[#8b1f23] to-[#5c1416] rounded-full pl-2 pr-6 py-1.5 text-white shadow-lg shadow-[#8b1f23]/20 border border-white/10 relative overflow-hidden group hover:scale-105 transition-transform duration-300">            
+            <div className="absolute top-0 left-0 w-full h-full bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="bg-white/10 p-1.5 rounded-full backdrop-blur-sm">
+              <Activity size={18} className="text-white" />
+            </div>
+            <h3 className="font-display text-lg font-bold text-white tracking-wide">
+              Laporan Pengaduan
+            </h3>
           </div>
-          <h3 className="font-display text-xl font-bold text-slate-800">Laporan Pengaduan</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {years.map(year => (
@@ -188,7 +168,7 @@ return (
               count={stats.laporan[year]}
               label="Laporan Masuk"
               icon={<FileText size={20} />}
-              colorClass="text-amber-600 bg-amber-50 group-hover:bg-amber-600 group-hover:text-white"
+              colorClass="text-[#8b1f23] bg-red-50 group-hover:bg-[#8b1f23] group-hover:text-white"
               onClick={() => handleStatClick(year, JENIS_PERKARA.LAPORAN_PENGADUAN)}
               isLoading={loading}
             />
@@ -198,11 +178,16 @@ return (
 
       {/* 2. PENYELIDIKAN */}
       <section>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-blue-100 text-blue-700 rounded-lg">
-            <Search size={20} />
+        <div className="mb-4">
+          <div className="inline-flex items-center gap-3 bg-gradient-to-r from-[#8b1f23] to-[#5c1416] rounded-full pl-2 pr-6 py-1.5 text-white shadow-lg shadow-[#8b1f23]/20 border border-white/10 relative overflow-hidden group hover:scale-105 transition-transform duration-300">            
+            <div className="absolute top-0 left-0 w-full h-full bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="bg-white/10 p-1.5 rounded-full backdrop-blur-sm">
+              <Search size={18} className="text-white" />
+            </div>
+            <h3 className="font-display text-lg font-bold text-white tracking-wide">
+              Penyelidikan
+            </h3>
           </div>
-          <h3 className="font-display text-xl font-bold text-slate-800">Penyelidikan</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {years.map(year => (
@@ -212,7 +197,7 @@ return (
               count={stats.penyelidikan[year]}
               label="Perkara Lid"
               icon={<Search size={20} />}
-              colorClass="text-blue-600 bg-blue-50 group-hover:bg-blue-600 group-hover:text-white"
+              colorClass="text-[#8b1f23] bg-red-50 group-hover:bg-[#8b1f23] group-hover:text-white"
               onClick={() => handleStatClick(year, JENIS_PERKARA.PENYELIDIKAN)}
               isLoading={loading}
             />
@@ -222,11 +207,16 @@ return (
 
       {/* 3. PENYIDIKAN */}
       <section>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-green-100 text-green-700 rounded-lg">
-            <Scale size={20} />
+        <div className="mb-4">
+          <div className="inline-flex items-center gap-3 bg-gradient-to-r from-[#8b1f23] to-[#5c1416] rounded-full pl-2 pr-6 py-1.5 text-white shadow-lg shadow-[#8b1f23]/20 border border-white/10 relative overflow-hidden group hover:scale-105 transition-transform duration-300">            
+            <div className="absolute top-0 left-0 w-full h-full bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="bg-white/10 p-1.5 rounded-full backdrop-blur-sm">
+              <Scale size={18} className="text-white" />
+            </div>
+            <h3 className="font-display text-lg font-bold text-white tracking-wide">
+              Penyidikan
+            </h3>
           </div>
-          <h3 className="font-display text-xl font-bold text-slate-800">Penyidikan</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {years.map(year => (
@@ -236,7 +226,7 @@ return (
               count={stats.penyidikan[year]}
               label="Perkara Dik"
               icon={<Scale size={20} />}
-              colorClass="text-green-600 bg-green-50 group-hover:bg-green-600 group-hover:text-white"
+              colorClass="text-[#8b1f23] bg-red-50 group-hover:bg-[#8b1f23] group-hover:text-white"
               onClick={() => handleStatClick(year, JENIS_PERKARA.PENYIDIKAN)}
               isLoading={loading}
             />
@@ -319,30 +309,63 @@ function StatCard({ year, count, label, icon, colorClass, onClick, isLoading }) 
 
 function StatusCard({ title, stats, isLoading }) {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 flex flex-col h-full">
-      <h3 className="font-display text-lg font-bold text-[#8b1f23] mb-6 border-b border-slate-50 pb-2">{title}</h3>
-      <div className="space-y-5 flex-1">
-        <StatusRow icon={<Clock size={18} />} color="text-blue-600 bg-blue-50" label="Dalam Proses" count={stats.proses} isLoading={isLoading} />
-        <StatusRow icon={<XCircle size={18} />} color="text-red-600 bg-red-50" label="Dihentikan" count={stats.dihentikan} isLoading={isLoading} />
-        <StatusRow icon={<CheckCircle size={18} />} color="text-green-600 bg-green-50" label="Tindak Lanjut" count={stats.naik} isLoading={isLoading} />
+    <div className="group bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col h-full relative overflow-hidden transition-all duration-300">
+      
+      {/* Decorative Top Gradient (Appears on Hover) */}
+      <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#8b1f23] to-[#5c1416] opacity-100 transition-opacity duration-300"></div>
+
+      {/* Header - Clean Left Aligned */}
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-50">
+        <h3 className="font-display text-lg font-bold text-slate-800 group-hover:text-[#8b1f23] transition-colors">
+          {title}
+        </h3>
+        {/* Subtle decorative dot */}
+        <div className="w-2 h-2 rounded-full bg-[#8b1f23] transition-colors"></div>
+      </div>
+
+      {/* Content */}
+      <div className="space-y-1 flex-grow">
+        <StatusRow 
+          icon={<Clock size={18} />} 
+          color="text-blue-600 bg-blue-50" 
+          label="Dalam Proses" 
+          count={stats.proses} 
+          isLoading={isLoading} 
+        />
+        <StatusRow 
+          icon={<XCircle size={18} />} 
+          color="text-red-600 bg-red-50" 
+          label="Dihentikan" 
+          count={stats.dihentikan} 
+          isLoading={isLoading} 
+        />
+        <StatusRow 
+          icon={<CheckCircle size={18} />} 
+          color="text-green-600 bg-green-50" 
+          label="Tindak Lanjut" 
+          count={stats.naik} 
+          isLoading={isLoading} 
+        />
       </div>
     </div>
   );
 }
 
+// Slightly updated StatusRow to have padding/hover background
 function StatusRow({ icon, color, label, count, isLoading }) {
   return (
-    <div className="flex items-center justify-between group">
+    <div className="flex items-center justify-between p-1 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
       <div className="flex items-center gap-3">
         <div className={`p-2 rounded-lg transition-colors ${color}`}>
           {icon}
         </div>
-        <span className="text-slate-600 font-medium group-hover:text-slate-900 transition-colors">{label}</span>
+        <span className="text-slate-600 font-medium text-sm">{label}</span>
       </div>
+      
       {isLoading ? (
         <div className="h-6 w-8 bg-slate-200 rounded animate-pulse"></div>
       ) : (
-        <span className="font-bold text-slate-800 text-lg">
+        <span className="font-bold text-slate-800 text-lg font-display">
           <CountUp end={count || 0} duration={1500} />
         </span>
       )}
