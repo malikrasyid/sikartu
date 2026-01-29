@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getPerkara } from '../services/perkaraService';
+import { useNavigate } from 'react-router-dom';
+import { usePerkara } from '../context/PerkaraContext';
 import {
   Lock as LockIcon, Search, Scale, FileText, LogOut, 
   FileWarning, CheckCircle, XCircle, Clock, 
@@ -10,27 +11,24 @@ import LogoutModal from '../components/LogoutModal';
 import { JENIS_PERKARA, STATUS_PERKARA, getYearOptions } from '../util';
 
 export default function Beranda() {
-  const [loading, setLoading] = useState(true);
+const { data, loading, fetchData } = usePerkara();
 
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
 
+  const navigate = useNavigate();
+
   const isLoggedIn = !!localStorage.getItem('token');
   
-  // 1. Get Years but FILTER OUT future years (Remove 2027 if current is 2026)
   const currentYear = new Date().getFullYear();
   const years = getYearOptions().filter(y => y <= currentYear);
-  
-  // Helper to create empty year object { 2024: 0, 2025: 0, 2026: 0 }
   const createYearlyStats = () => years.reduce((acc, year) => ({ ...acc, [year]: 0 }), {});
 
   const [stats, setStats] = useState({
     total: 0,
-    // Years Stats
     laporan: createYearlyStats(),
     penyelidikan: createYearlyStats(),
     penyidikan: createYearlyStats(),
-    // Status Breakdown Stats
     statusLaporan: { proses: 0, dihentikan: 0, naik: 0 },
     statusPenyelidikan: { proses: 0, dihentikan: 0, naik: 0 },
     statusPenyidikan: { proses: 0, dihentikan: 0, naik: 0 },
@@ -38,8 +36,16 @@ export default function Beranda() {
   });
 
   useEffect(() => {
-    calculateStats();
-  }, []);
+    // Optional: If Admin, force fetch to ensure fresh data
+    const shouldForce = isLoggedIn; 
+    fetchData(shouldForce);
+  }, [fetchData, isLoggedIn]);
+
+  useEffect(() => {
+    if (!loading && data) {
+        calculateStatsFromData(data);
+    }
+  }, [data, loading]);
 
   const handleLogoutClick = () => {
     setIsLogoutOpen(true); 
@@ -50,29 +56,30 @@ export default function Beranda() {
     setIsLogoutOpen(false);
     window.location.reload(); 
   };
-  const calculateStats = async () => {
-    try {
-      const data = await getPerkara();
-      
+
+  const handleStatClick = (year, jenis) => {
+    navigate('/arsip', { state: { year, jenis } });
+  };
+
+  const calculateStatsFromData = (items) => {
       const newStats = {
-        total: data.length,
+        total: items.length,
         laporan: createYearlyStats(),
         penyelidikan: createYearlyStats(),
         penyidikan: createYearlyStats(),
         statusLaporan: { proses: 0, dihentikan: 0, naik: 0 },
         statusPenyelidikan: { proses: 0, dihentikan: 0, naik: 0 },
         statusPenyidikan: { proses: 0, dihentikan: 0, naik: 0 },
-        recentCases: data.slice(0, 5) 
+        recentCases: items.slice(0, 5) 
       };
 
-      data.forEach(item => {
+      items.forEach(item => {
         const year = item.tahun;
-        const jenis = item.jenis_perkara; // Exact match from util constants
+        const jenis = item.jenis_perkara; 
         const status = item.status_perkara;
 
         let yearTarget, statusTarget;
 
-        // --- MAP DATA TO TARGETS ---
         if (jenis === JENIS_PERKARA.LAPORAN_PENGADUAN) {
           yearTarget = newStats.laporan;
           statusTarget = newStats.statusLaporan;
@@ -83,13 +90,11 @@ export default function Beranda() {
           yearTarget = newStats.penyidikan;
           statusTarget = newStats.statusPenyidikan;
         } else {
-          return; // Skip unknown types
+          return;
         }
 
-        // 1. Count Yearly Stats (Safety check: only count if year is in our list)
         if (yearTarget[year] !== undefined) yearTarget[year]++;
 
-        // 2. Count Status Stats (Using strict Enum comparison)
         if (status === STATUS_PERKARA.DALAM_PROSES) {
             statusTarget.proses++;
         } else if (status === STATUS_PERKARA.DIHENTIKAN) {
@@ -102,16 +107,8 @@ export default function Beranda() {
             statusTarget.naik++;
         }
       });
-
-      setStats(newStats);
-    } catch (error) {
-      console.error("Failed to load dashboard stats", error);
-    } finally {
-      setLoading(false);
-    }
+      setStats(newStats);    
   };
-
-  if (loading) return <div className="p-8 text-center">Memuat Data Dashboard...</div>;
 
 return (
     <div id="page-dashboard" className="page-content animate-fade-in relative space-y-8">
@@ -159,7 +156,13 @@ return (
               <Activity size={20} />
               <p className="text-sm font-medium uppercase tracking-wider">Total Seluruh Perkara</p>
             </div>
-            <p className="text-6xl font-display font-bold">{stats.total}</p>
+            {loading ? (
+                <div className="h-14 w-24 bg-white/20 rounded animate-pulse"></div>
+            ) : (
+                <p className="text-6xl font-display font-bold">
+                  <CountUp end={stats.total} duration={2000} />
+                </p>
+            )}
           </div>
           <div className="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/10 shadow-inner">
             <Scale className="w-10 h-10 text-[#d4af37]" />
@@ -186,6 +189,8 @@ return (
               label="Laporan Masuk"
               icon={<FileText size={20} />}
               colorClass="text-amber-600 bg-amber-50 group-hover:bg-amber-600 group-hover:text-white"
+              onClick={() => handleStatClick(year, JENIS_PERKARA.LAPORAN_PENGADUAN)}
+              isLoading={loading}
             />
           ))}
         </div>
@@ -208,6 +213,8 @@ return (
               label="Perkara Lid"
               icon={<Search size={20} />}
               colorClass="text-blue-600 bg-blue-50 group-hover:bg-blue-600 group-hover:text-white"
+              onClick={() => handleStatClick(year, JENIS_PERKARA.PENYELIDIKAN)}
+              isLoading={loading}
             />
           ))}
         </div>
@@ -230,6 +237,8 @@ return (
               label="Perkara Dik"
               icon={<Scale size={20} />}
               colorClass="text-green-600 bg-green-50 group-hover:bg-green-600 group-hover:text-white"
+              onClick={() => handleStatClick(year, JENIS_PERKARA.PENYIDIKAN)}
+              isLoading={loading}
             />
           ))}
         </div>
@@ -245,39 +254,27 @@ return (
       {/* RECENT CASES */}
       <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="font-display text-lg font-bold text-[#8b1f23]">Perkara Terbaru</h3>
-          <button className="text-sm font-medium text-slate-500 hover:text-[#8b1f23] flex items-center gap-1 transition-colors">
-            Lihat Semua <ChevronRight size={16} />
-          </button>
+          <h3 className="font-display text-lg font-bold text-[#8b1f23]">Perkara Terbaru</h3>       
         </div>
         <div className="space-y-3">
-          {stats.recentCases.length > 0 ? (
-            stats.recentCases.map((perkara) => (
-              <div key={perkara._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-all group">
-                <div className="flex items-center gap-4">
-                  <div className="p-2 bg-white rounded-lg border border-gray-200 text-slate-400 group-hover:text-[#8b1f23] group-hover:border-[#8b1f23]/20 transition-colors">
-                    <FileText size={20} />
+          {loading ? [1,2,3].map(i => <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 animate-pulse"><div className="h-10 w-40 bg-gray-200 rounded"></div></div>) : 
+                stats.recentCases.length > 0 ? stats.recentCases.map((perkara) => (
+                  <div key={perkara._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-all group">
+                     <div className="flex items-center gap-4">
+                      <div className="p-2 bg-white rounded-lg border border-gray-200 text-slate-400 group-hover:text-[#8b1f23] group-hover:border-[#8b1f23]/20 transition-colors">
+                        <FileText size={20} />
+                      </div>
+                      <div>
+                        <p className="font-bold text-gray-800 text-sm group-hover:text-[#8b1f23] transition-colors">{perkara.nama_perkara}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">{perkara.nomor_sp}</p>
+                      </div>
+                    </div>
+                     <span className={`text-xs px-2.5 py-1 rounded-full font-bold border ${perkara.status_perkara.includes('Selesai') || perkara.status_perkara.includes('Naik') ? 'bg-green-50 text-green-700 border-green-200' : perkara.status_perkara.includes('Proses') ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-red-50 text-red-700 border-red-200'}`}>{perkara.status_perkara}</span>
                   </div>
-                  <div>
-                    <p className="font-bold text-gray-800 text-sm group-hover:text-[#8b1f23] transition-colors">{perkara.nama_perkara}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{perkara.nomor_sp}</p>
-                  </div>
-                </div>
-                <span className={`text-xs px-2.5 py-1 rounded-full font-bold border 
-                  ${perkara.status_perkara.includes('Selesai') || perkara.status_perkara.includes('Naik') 
-                    ? 'bg-green-50 text-green-700 border-green-200' 
-                    : perkara.status_perkara.includes('Proses') 
-                    ? 'bg-blue-50 text-blue-700 border-blue-200' 
-                    : 'bg-red-50 text-red-700 border-red-200'}`}>
-                  {perkara.status_perkara}
-                </span>
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-8 text-slate-400 italic">Belum ada perkara terdaftar</div>
-          )}
-        </div>
-      </div>
+                )) : <div className="text-center py-8 text-slate-400 italic">Belum ada perkara</div>
+              }
+             </div>
+          </div>
 
       {isLoginOpen && <LoginModal closeModal={() => setIsLoginOpen(false)} />}
       
@@ -291,42 +288,49 @@ return (
   );
 }
 
-// --- NEW COMPONENT: Clean, Modern Stat Card ---
-function StatCard({ year, count, label, icon, colorClass }) {
+function StatCard({ year, count, label, icon, colorClass, onClick, isLoading }) {
   return (
     <div className="group bg-white rounded-xl p-5 border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Tahun {year}</p>
           <div className="flex items-baseline gap-1">
-            <span className="text-3xl font-display font-bold text-slate-800">{count || 0}</span>
+            {isLoading ? (
+               <div className="h-8 w-12 bg-slate-200 rounded animate-pulse mb-1"></div>
+            ) : (
+               <span className="text-3xl font-display font-bold text-slate-800">
+                 <CountUp end={count || 0} />
+               </span>
+            )}
             <span className="text-xs text-slate-500 font-medium">kasus</span>
           </div>
         </div>
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300 ${colorClass}`}>
+        <div 
+          className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300 ${colorClass}`}
+          onClick={onClick}
+          title="Lihat Detail"
+        >
           {icon}
         </div>
       </div>
-      
     </div>
   );
 }
 
-// --- NEW COMPONENT: Status Card ---
-function StatusCard({ title, stats }) {
+function StatusCard({ title, stats, isLoading }) {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 flex flex-col h-full">
       <h3 className="font-display text-lg font-bold text-[#8b1f23] mb-6 border-b border-slate-50 pb-2">{title}</h3>
       <div className="space-y-5 flex-1">
-        <StatusRow icon={<Clock size={18} />} color="text-blue-600 bg-blue-50" label="Dalam Proses" count={stats.proses} />
-        <StatusRow icon={<XCircle size={18} />} color="text-red-600 bg-red-50" label="Dihentikan" count={stats.dihentikan} />
-        <StatusRow icon={<CheckCircle size={18} />} color="text-green-600 bg-green-50" label="Tindak Lanjut" count={stats.naik} />
+        <StatusRow icon={<Clock size={18} />} color="text-blue-600 bg-blue-50" label="Dalam Proses" count={stats.proses} isLoading={isLoading} />
+        <StatusRow icon={<XCircle size={18} />} color="text-red-600 bg-red-50" label="Dihentikan" count={stats.dihentikan} isLoading={isLoading} />
+        <StatusRow icon={<CheckCircle size={18} />} color="text-green-600 bg-green-50" label="Tindak Lanjut" count={stats.naik} isLoading={isLoading} />
       </div>
     </div>
   );
 }
 
-function StatusRow({ icon, color, label, count }) {
+function StatusRow({ icon, color, label, count, isLoading }) {
   return (
     <div className="flex items-center justify-between group">
       <div className="flex items-center gap-3">
@@ -335,7 +339,42 @@ function StatusRow({ icon, color, label, count }) {
         </div>
         <span className="text-slate-600 font-medium group-hover:text-slate-900 transition-colors">{label}</span>
       </div>
-      <span className="font-bold text-slate-800 text-lg">{count}</span>
+      {isLoading ? (
+        <div className="h-6 w-8 bg-slate-200 rounded animate-pulse"></div>
+      ) : (
+        <span className="font-bold text-slate-800 text-lg">
+          <CountUp end={count || 0} duration={1500} />
+        </span>
+      )}
     </div>
   );
+}
+
+function CountUp({ end, duration = 1500 }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let startTimestamp = null;
+    let animationFrame;
+
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      
+      // Ease Out Expo: Starts fast, ends slow (Smooth UI feel)
+      const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      
+      setCount(Math.floor(easeProgress * end));
+      
+      if (progress < 1) {
+        animationFrame = window.requestAnimationFrame(step);
+      }
+    };
+
+    animationFrame = window.requestAnimationFrame(step);
+    
+    return () => cancelAnimationFrame(animationFrame);
+  }, [end, duration]);
+
+  return <>{count}</>;
 }

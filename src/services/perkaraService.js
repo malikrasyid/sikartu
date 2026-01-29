@@ -14,20 +14,13 @@ export const getPerkaraById = async (id) => {
 
 // POST: Create new (Need to handle FormData for file upload)
 export const createPerkara = async (formData) => {
-  // Note: Content-Type 'multipart/form-data' is handled automatically by axios when passing FormData
-  const response = await api.post('/perkara', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  const response = await api.post('/perkara', formData);
   return response.data;
 };
 
-// PATCH: Update status only
-export const updateStatus = async (id, newStatus) => {
-  const response = await api.patch(`/perkara/${id}/status`, {
-    status_perkara: newStatus
-  });
+// PUT: Update ALL fields (including file)
+export const updatePerkara = async (id, formData) => {
+  const response = await api.put(`/perkara/${id}`, formData);
   return response.data;
 };
 

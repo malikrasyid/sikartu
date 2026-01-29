@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { X, Upload, Check, AlertCircle } from 'lucide-react';
 import { createPerkara } from '../services/perkaraService';
 import { JENIS_PERKARA, getAllowedStatuses, getYearOptions } from '../util';
@@ -17,37 +17,33 @@ export default function AddPerkaraModal({ isOpen, onClose, onSuccess }) {
     jenis_perkara: defaultJenis,
     tahun: new Date().getFullYear(),
     status_perkara: defaultStatus,
-    dokumen_terkait: null
+    keterangan: '',
+    dokumen_terkait: []
   });
 
   const validStatuses = getAllowedStatuses(formData.jenis_perkara);
-
   const years = getYearOptions();
   
-  // Handle Input Change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
-    // SPECIAL HANDLING: If Jenis Perkara changes, reset Status to the first valid option
     if (name === 'jenis_perkara') {
       const newStatuses = getAllowedStatuses(value);
       setFormData(prev => ({
         ...prev,
         [name]: value,
-        status_perkara: newStatuses[0] // Auto-select first valid status
+        status_perkara: newStatuses[0] 
       }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
-  // Handle File Change
+  // Handle Multiple Files
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setFormData(prev => ({ ...prev, dokumen_terkait: file }));
+    const files = Array.from(e.target.files);
+    setFormData(prev => ({ ...prev, dokumen_terkait: files }));
   };
 
-  // Handle Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -56,11 +52,20 @@ export default function AddPerkaraModal({ isOpen, onClose, onSuccess }) {
     try {
       // Create FormData object for file upload
       const data = new FormData();
-      Object.keys(formData).forEach(key => {
-        if (formData[key] !== null) {
-          data.append(key, formData[key]);
-        }
-      });
+      data.append('nama_perkara', formData.nama_perkara);
+      data.append('nomor_sp', formData.nomor_sp);
+      data.append('tanggal_sp', formData.tanggal_sp);
+      data.append('jenis_perkara', formData.jenis_perkara);
+      data.append('tahun', formData.tahun);
+      data.append('status_perkara', formData.status_perkara);
+      data.append('keterangan', formData.keterangan); // Append Keterangan
+
+      // Append Multiple Files
+      if (formData.dokumen_terkait && formData.dokumen_terkait.length > 0) {
+        formData.dokumen_terkait.forEach((file) => {
+          data.append('dokumen_terkait', file);
+        });
+      }
 
       const newItem = await createPerkara(data);
       
@@ -148,14 +153,45 @@ export default function AddPerkaraModal({ isOpen, onClose, onSuccess }) {
             </div>
 
             <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">Keterangan</label>
+              <textarea 
+                name="keterangan" 
+                rows="3" 
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#8b1f23] outline-none resize-none"
+                placeholder="Tambahkan keterangan tambahan..."
+                value={formData.keterangan}
+                onChange={handleChange}
+              ></textarea>
+            </div>
+
+            <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1">Dokumen Fisik (PDF)</label>
               <div className="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center hover:bg-slate-50 transition cursor-pointer relative">
-                <input type="file" accept=".pdf" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                <input 
+                  type="file" 
+                  accept=".pdf" 
+                  multiple // Allow multiple
+                  onChange={handleFileChange} 
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                />
                 <div className="flex flex-col items-center gap-2 text-slate-500">
                   <Upload size={24} />
-                  <span className="text-sm font-medium">{formData.dokumen_terkait ? formData.dokumen_terkait.name : 'Klik untuk upload dokumen'}</span>
+                  <span className="text-sm font-medium">
+                    {formData.dokumen_terkait.length > 0 
+                      ? `${formData.dokumen_terkait.length} file dipilih` 
+                      : 'Klik untuk upload dokumen (Bisa banyak)'}
+                  </span>
                 </div>
               </div>
+              {formData.dokumen_terkait.length > 0 && (
+                <div className="mt-2 space-y-1">
+                  {formData.dokumen_terkait.map((file, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-xs text-slate-600 bg-slate-100 p-1.5 rounded">
+                      <FileText size={14} /> <span className="truncate">{file.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100 mt-6">

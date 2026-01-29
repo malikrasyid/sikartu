@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Filter, FolderOpen, FileText, Trash2, Calendar, Clock, Edit2, Check, X } from 'lucide-react';
-import { getPerkara, deletePerkara, updateStatus } from '../services/perkaraService';
+import { usePerkara } from '../context/PerkaraContext';
+import { useLocation } from 'react-router-dom';
+import { Plus, Search, Filter, FolderOpen, FileText, Trash2, Calendar, Clock, X, Info, StickyNote } from 'lucide-react';
+import { getPerkara, deletePerkara } from '../services/perkaraService';
 import AddPerkaraModal from '../components/AddPerkaraModal';
 import DeleteModal from '../components/DeleteModal';
+import DetailPerkaraModal from '../components/DetailPerkaraModal';
 import { 
   formatDate, 
   getStatusColor, 
@@ -14,58 +17,67 @@ import {
 } from '../util';
 
 export default function ArsipPerkara() {
-  const [data, setData] = useState([]);
+  const { data, loading, fetchData, setData } = usePerkara();
+  const location = useLocation();
   
-  // MODAL & EDIT STATES
+  // MODAL STATES
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [tempStatus, setTempStatus] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
+  
+  // Detail Modal State
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [detailId, setDetailId] = useState(null);
+  
   const [selectedDeleteId, setSelectedDeleteId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   // FILTERS
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [selectedYear, setSelectedYear] = useState("all"); 
-  
+  const [selectedYear, setSelectedYear] = useState(location.state?.year || "all"); 
+  const [jenisFilter, setJenisFilter] = useState(location.state?.jenis || "All");
+
   const isLoggedIn = !!localStorage.getItem('token');
   const years = getYearOptions(); 
 
-  const fetchData = async () => {
-    try {
-      const result = await getPerkara();
-      setData(result);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
-  // --- NEW: Handle Direct State Update for ADD ---
+  useEffect(() => {
+    if (location.state?.year) setSelectedYear(location.state.year); 
+    if (location.state?.jenis) setJenisFilter(location.state.jenis);
+  }, [location.state]);
+
   const handleAddSuccess = (newItem) => {
-    // If the API returns the new item, add it to the top of the list
     if (newItem) {
       setData(prev => [newItem, ...prev]);
-    } else {
-      // Fallback if API doesn't return data (safeguard)
-      fetchData();
-    }
+    } else 
+      fetchData(true);    
   };
 
-  // DERIVED STATE (Filters)
+  const handleUpdateSuccess = (updatedItem) => {
+    if (updatedItem) {
+      setData(prev => prev.map(item => item._id === updatedItem._id ? updatedItem : item));
+    } else 
+      fetchData(true);
+    
+  };
+
+  const handleDetailClick = (id) => {
+    setDetailId(id);
+    setIsDetailModalOpen(true);
+  };
+
   const filteredData = data.filter((item) => {
     const matchYear = selectedYear === "all" || item.tahun === parseInt(selectedYear);
     const matchStatus = statusFilter === "All" || item.status_perkara === statusFilter;
+    const matchJenis = jenisFilter === "All" || item.jenis_perkara === jenisFilter;
     const matchSearch = !searchTerm || (
       item.nama_perkara?.toLowerCase().includes(searchTerm.toLowerCase()) || 
       item.nomor_sp?.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    return matchYear && matchStatus && matchSearch;
+    return matchYear && matchStatus && matchJenis && matchSearch;
   });
 
   const handleDeleteClick = (id) => { setSelectedDeleteId(id); setIsDeleteModalOpen(true); };
@@ -80,19 +92,6 @@ export default function ArsipPerkara() {
       setSelectedDeleteId(null);
     } catch (error) { console.error(error); alert("Gagal hapus"); } 
     finally { setIsDeleting(false); }
-  };
-  
-  const handleEditClick = (item) => { setEditingId(item._id); setTempStatus(item.status_perkara); };
-  const handleCancelEdit = () => { setEditingId(null); setTempStatus(""); };
-
-  const handleSaveStatus = async (id) => { 
-    setIsSaving(true);
-    try {
-      await updateStatus(id, tempStatus);
-      setData(prevData => prevData.map(item => item._id === id ? { ...item, status_perkara: tempStatus } : item));
-      setEditingId(null);
-    } catch (error) { alert("Gagal update"); } 
-    finally { setIsSaving(false); }
   };
 
   return (
@@ -124,6 +123,13 @@ export default function ArsipPerkara() {
             {years.map((year) => (<option key={year} value={year}>{year}</option>))}
           </select>
         </div>
+        <div className="relative min-w-[160px] group">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><FolderOpen className="text-slate-400 group-focus-within:text-[#8b1f23] transition-colors" size={18} /></div>
+          <select className="block w-full pl-10 pr-8 py-2.5 border-none bg-transparent rounded-xl text-slate-700 font-medium focus:ring-2 focus:ring-[#8b1f23]/10 focus:bg-slate-50 cursor-pointer appearance-none transition-all" value={jenisFilter} onChange={(e) => setJenisFilter(e.target.value)}>
+            <option value="All">Semua Jenis</option>
+            {Object.values(JENIS_PERKARA).map(jenis => (<option key={jenis} value={jenis}>{jenis}</option>))}
+          </select>
+        </div>
         <div className="relative min-w-[180px] group">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Filter className="text-slate-400 group-focus-within:text-[#8b1f23] transition-colors" size={18} /></div>
           <select className="block w-full pl-10 pr-10 py-2.5 border-none bg-transparent rounded-xl text-slate-700 font-medium focus:ring-2 focus:ring-[#8b1f23]/10 focus:bg-slate-50 cursor-pointer appearance-none transition-all" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
@@ -131,8 +137,18 @@ export default function ArsipPerkara() {
             {Object.values(STATUS_PERKARA).map(status => (<option key={status} value={status}>{status}</option>))}
           </select>
         </div>
-      </div>
 
+        {(selectedYear !== 'all' || jenisFilter !== 'All' || statusFilter !== 'All' || searchTerm) && (
+          <button 
+            onClick={() => {setSearchTerm(''); setStatusFilter('All'); setSelectedYear('all'); setJenisFilter('All');}}
+            className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+            title="Reset Filters"
+          >
+            <X size={20} />
+          </button>
+        )}
+      </div>
+      
       {/* DATA GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredData && filteredData.length > 0 ? (
@@ -143,34 +159,32 @@ export default function ArsipPerkara() {
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <h3 className="font-display font-bold text-slate-800 text-lg leading-snug flex-1 group-hover:text-[#8b1f23] transition-colors">{item.nama_perkara}</h3>
                   <div className="shrink-0">
-                    {editingId === item._id ? (
-                       <select value={tempStatus} onChange={(e) => setTempStatus(e.target.value)} className="px-2 py-1 text-xs font-semibold rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#8b1f23] shadow-sm max-w-[140px]">
-                         {getAllowedStatuses(item.jenis_perkara).map(status => (<option key={status} value={status}>{status}</option>))}
-                       </select>
-                    ) : (
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${getStatusColor(item.status_perkara)}`}>{item.status_perkara}</span>
-                    )}
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${getStatusColor(item.status_perkara)}`}>{item.status_perkara}</span>                    
                   </div>
                 </div>
+              
                 <div className="space-y-3 text-sm text-slate-500 flex-1">
                   <div className="flex items-center gap-3"><FileText size={16} className="text-slate-400 shrink-0" /><span className="font-mono text-slate-600 bg-slate-50 px-2 py-0.5 rounded border border-slate-100 font-medium">{item.nomor_sp}</span></div>
                   <div className="flex items-center gap-3"><Calendar size={16} className="text-slate-400 shrink-0" /><span>{formatDate(item.tanggal_sp)}</span></div>
                   <div className="flex items-center gap-3"><FolderOpen size={16} className="text-slate-400 shrink-0" /><span>{item.jenis_perkara}</span></div>
                   <div className="flex items-center gap-3"><Clock size={16} className="text-slate-400 shrink-0" /><span>Tahun: {item.tahun}</span></div>
+                  {item.keterangan && (
+                    <div className="flex items-center gap-3">
+                      <StickyNote size={16} className="text-slate-400 shrink-0" />
+                      <span className="truncate">{item.keterangan}</span>
+                    </div>
+                  )}
                 </div>
                 {isLoggedIn && (
-                  <div className="mt-5 pt-4 border-t border-slate-50 flex items-center justify-end gap-2">
-                    {editingId === item._id ? (
-                      <>
-                        <button onClick={handleCancelEdit} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition font-medium text-xs"><X size={14} /> Batal</button>
-                        <button onClick={() => handleSaveStatus(item._id)} disabled={isSaving} className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium text-xs shadow-sm"><Check size={14} /> {isSaving ? 'Menyimpan...' : 'Simpan'}</button>
-                      </>
-                    ) : (
-                      <>
-                        <button onClick={() => handleEditClick(item)} className="flex items-center gap-2 px-3 py-1.5 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition shadow-sm font-medium text-xs" title="Ubah Status"><Edit2 size={14} /> Ubah</button>
-                        <button onClick={() => handleDeleteClick(item._id)} className="flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow-sm font-medium text-xs" title="Hapus Perkara"><Trash2 size={14} /> Hapus</button>
-                      </>
-                    )}
+                  <div className="pt-4 border-t border-slate-50 flex items-center justify-end gap-2">
+                    <button 
+                      onClick={() => handleDetailClick(item._id)} 
+                      className="flex items-center gap-2 px-3 py-1.5 bg-gray-500 text-white rounded-lg hover:bg-slate-800 hover:text-white transition shadow-sm font-medium text-xs" 
+                      title="Lihat Detail & Edit Full"
+                    >
+                      <Info size={14} /> Detail
+                    </button>                    
+                    <button onClick={() => handleDeleteClick(item._id)} className="flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow-sm font-medium text-xs" title="Hapus Perkara"><Trash2 size={14} /> Hapus</button>                  
                   </div>
                 )}
               </div>
@@ -180,18 +194,20 @@ export default function ArsipPerkara() {
           <div className="col-span-full text-center py-16 bg-white rounded-2xl border border-dashed border-slate-300">
              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4"><FolderOpen className="text-slate-300" size={32} /></div>
              <h3 className="text-slate-900 font-semibold text-lg">Tidak ada data ditemukan</h3>
-             <button onClick={() => {setSearchTerm(''); setStatusFilter('All'); setSelectedYear('all');}} className="mt-4 text-[#8b1f23] font-medium text-sm hover:underline">Reset Filter</button>
+             <button onClick={() => {setSearchTerm(''); setStatusFilter('All'); setSelectedYear('all'); setJenisFilter('All');}} className="mt-4 text-[#8b1f23] font-medium text-sm hover:underline">Reset Filter</button>
           </div>
         )}
       </div>
 
-      {isModalOpen && (
-        <AddPerkaraModal 
-          isOpen={isModalOpen} 
-          onClose={() => setIsModalOpen(false)} 
-          onSuccess={handleAddSuccess} // PASS THE NEW HANDLER
-        />
-      )}
+      <AddPerkaraModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={handleAddSuccess} />
+      
+      <DetailPerkaraModal 
+        isOpen={isDetailModalOpen} 
+        onClose={() => setIsDetailModalOpen(false)} 
+        perkaraId={detailId}
+        onSuccess={handleUpdateSuccess}
+      />
+
       {isDeleteModalOpen && <DeleteModal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} onConfirm={confirmDelete} isLoading={isDeleting} />}
     </div>
   );
