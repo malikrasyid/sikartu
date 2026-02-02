@@ -10,7 +10,7 @@ import LogoutModal from '../components/LogoutModal';
 import { JENIS_PERKARA, STATUS_PERKARA, getYearOptions } from '../util';
 
 export default function Beranda() {
-const { data, loading, fetchData } = usePerkara();
+  const { data, loading, fetchData } = usePerkara();
 
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
@@ -236,10 +236,25 @@ return (
 
       {/* --- STATUS OVERVIEW --- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <StatusCard title="Status Laporan" stats={stats.statusLaporan} />
-        <StatusCard title="Status Penyelidikan" stats={stats.statusPenyelidikan} />
-        <StatusCard title="Status Penyidikan" stats={stats.statusPenyidikan} />
-      </div>
+            <StatusCard 
+                title="Status Laporan" 
+                stats={stats.statusLaporan} 
+                jenis={JENIS_PERKARA.LAPORAN_PENGADUAN} // Pass Jenis
+                isLoading={loading} 
+            />
+            <StatusCard 
+                title="Status Penyelidikan" 
+                stats={stats.statusPenyelidikan} 
+                jenis={JENIS_PERKARA.PENYELIDIKAN} // Pass Jenis
+                isLoading={loading} 
+            />
+            <StatusCard 
+                title="Status Penyidikan" 
+                stats={stats.statusPenyidikan} 
+                jenis={JENIS_PERKARA.PENYIDIKAN} // Pass Jenis
+                isLoading={loading} 
+            />
+          </div>
 
       {/* RECENT CASES */}
       <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100">
@@ -307,54 +322,53 @@ function StatCard({ year, count, label, icon, colorClass, onClick, isLoading }) 
   );
 }
 
-function StatusCard({ title, stats, isLoading }) {
+function StatusCard({ title, stats, jenis, isLoading }) {
+  const navigate = useNavigate();
+
+  // Handle navigation based on the row category
+  const handleRowClick = (category) => {
+    let statusFilter = "All";
+
+    if (category === 'proses') {
+        statusFilter = STATUS_PERKARA.DALAM_PROSES;
+    } else if (category === 'dihentikan') {
+        statusFilter = STATUS_PERKARA.DIHENTIKAN;
+    } else if (category === 'naik') {
+        // Map JENIS to the specific "Naik" status
+        if (jenis === JENIS_PERKARA.LAPORAN_PENGADUAN) {
+            statusFilter = STATUS_PERKARA.NAIK_PENYELIDIKAN;
+        } else if (jenis === JENIS_PERKARA.PENYELIDIKAN) {
+            statusFilter = STATUS_PERKARA.NAIK_PENYIDIKAN;
+        } else if (jenis === JENIS_PERKARA.PENYIDIKAN) {
+            statusFilter = STATUS_PERKARA.NAIK_PRAPENUNTUTAN;
+        }
+    }
+
+    navigate('/arsip', { state: { jenis: jenis, status: statusFilter } });
+  };
+
   return (
-    <div className="group bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col h-full relative overflow-hidden transition-all duration-300">
-      
-      {/* Decorative Top Gradient (Appears on Hover) */}
-      <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#8b1f23] to-[#5c1416] opacity-100 transition-opacity duration-300"></div>
-
-      {/* Header - Clean Left Aligned */}
-      <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-50">
-        <h3 className="font-display text-lg font-bold text-slate-800 group-hover:text-[#8b1f23] transition-colors">
-          {title}
-        </h3>
-        {/* Subtle decorative dot */}
-        <div className="w-2 h-2 rounded-full bg-[#8b1f23] transition-colors"></div>
+    <div className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg border border-slate-100 flex flex-col h-full relative overflow-hidden transition-all duration-300">
+      <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-200 group-hover:bg-gradient-to-r from-[#8b1f23] to-[#5c1416] transition-opacity duration-300"></div>
+      <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-50">
+        <h3 className="font-display text-lg font-bold text-slate-800 group-hover:text-[#8b1f23] transition-colors">{title}</h3>
+        <div className="w-2 h-2 rounded-full bg-gray-200 group-hover:bg-[#8b1f23] transition-colors"></div>
       </div>
-
-      {/* Content */}
-      <div className="space-y-1 flex-grow">
-        <StatusRow 
-          icon={<Clock size={18} />} 
-          color="text-blue-600 bg-blue-50" 
-          label="Dalam Proses" 
-          count={stats.proses} 
-          isLoading={isLoading} 
-        />
-        <StatusRow 
-          icon={<XCircle size={18} />} 
-          color="text-red-600 bg-red-50" 
-          label="Dihentikan" 
-          count={stats.dihentikan} 
-          isLoading={isLoading} 
-        />
-        <StatusRow 
-          icon={<CheckCircle size={18} />} 
-          color="text-green-600 bg-green-50" 
-          label="Tindak Lanjut" 
-          count={stats.naik} 
-          isLoading={isLoading} 
-        />
+      <div className="space-y-2 flex-1">
+        <StatusRow icon={<Clock size={18} />} color="text-blue-600 bg-blue-50" label="Dalam Proses" count={stats.proses} isLoading={isLoading} onClick={() => handleRowClick('proses')} />
+        <StatusRow icon={<XCircle size={18} />} color="text-red-600 bg-red-50" label="Dihentikan" count={stats.dihentikan} isLoading={isLoading} onClick={() => handleRowClick('dihentikan')} />
+        <StatusRow icon={<CheckCircle size={18} />} color="text-green-600 bg-green-50" label="Tindak Lanjut" count={stats.naik} isLoading={isLoading} onClick={() => handleRowClick('naik')} />
       </div>
     </div>
   );
 }
 
 // Slightly updated StatusRow to have padding/hover background
-function StatusRow({ icon, color, label, count, isLoading }) {
+function StatusRow({ icon, color, label, count, isLoading, onClick }) {
   return (
-    <div className="flex items-center justify-between p-1 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
+    <div 
+      onClick={onClick}
+      className="flex items-center justify-between p-1 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
       <div className="flex items-center gap-3">
         <div className={`p-2 rounded-lg transition-colors ${color}`}>
           {icon}

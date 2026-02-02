@@ -47,6 +47,7 @@ export default function ArsipPerkara() {
   useEffect(() => {
     if (location.state?.year) setSelectedYear(location.state.year); 
     if (location.state?.jenis) setJenisFilter(location.state.jenis);
+    if (location.state?.status) setStatusFilter(location.state.status);
   }, [location.state]);
 
   const handleAddSuccess = (newItem) => {

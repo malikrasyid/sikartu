@@ -7,7 +7,7 @@ export default function Sidebar({ isOpen, onClose }) {
   const getLinkClass = (path) => {
     const baseClass = "flex items-center gap-3 p-3 mx-2 rounded-lg transition-all duration-200";
     return location.pathname === path 
-      ? `${baseClass} bg-white/10 border-l-4 border-[#d4af37] text-white font-medium shadow-inner` 
+      ? `${baseClass} bg-white/10 text-white font-medium shadow-inner` 
       : `${baseClass} text-slate-200 hover:bg-white/5 hover:text-white`;
   };
 
