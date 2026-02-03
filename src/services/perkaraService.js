@@ -14,13 +14,21 @@ export const getPerkaraById = async (id) => {
 
 // POST: Create new (Need to handle FormData for file upload)
 export const createPerkara = async (formData) => {
-  const response = await api.post('/perkara', formData);
+  const response = await api.post('/perkara', formData, {
+    headers: {
+      'Content-Type': undefined, // Overrides the global JSON setting
+    },
+  });
   return response.data;
 };
 
 // PUT: Update ALL fields (including file)
 export const updatePerkara = async (id, formData) => {
-  const response = await api.put(`/perkara/${id}`, formData);
+  const response = await api.put(`/perkara/${id}`, formData, {
+    headers: {
+      'Content-Type': undefined, // Overrides the global JSON setting
+    },
+  });
   return response.data;
 };
 

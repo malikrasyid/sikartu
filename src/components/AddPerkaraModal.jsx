@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Upload, Check, AlertCircle } from 'lucide-react';
+import { X, Upload, Check, AlertCircle, FileText } from 'lucide-react';
 import { createPerkara } from '../services/perkaraService';
 import { JENIS_PERKARA, getAllowedStatuses, getYearOptions } from '../util';
 
@@ -67,6 +67,7 @@ export default function AddPerkaraModal({ isOpen, onClose, onSuccess }) {
         });
       }
 
+      console.log('Submitting data:', formData);
       const newItem = await createPerkara(data);
       
       onSuccess(newItem); 
